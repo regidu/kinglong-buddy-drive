@@ -1,5 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MapPin, Wrench, Fuel, UtensilsCrossed, Car, Store } from "lucide-react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
+// Fix default marker icons
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+});
 
 const categories = [
   { id: "all", label: "Todos", icon: MapPin },
@@ -11,14 +22,14 @@ const categories = [
 ];
 
 const mockLocations = [
-  { name: "King Long CDMX Centro", type: "dealer", address: "Av. Insurgentes Sur 1234, CDMX", distance: "2.3 km" },
-  { name: "Taller Certificado Monterrey", type: "taller", address: "Blvd. Constitución 456, MTY", distance: "5.1 km" },
-  { name: "Gasolinera BP Reforma", type: "gas", address: "Paseo de la Reforma 789, CDMX", distance: "0.8 km" },
-  { name: "Vulcanizadora Express", type: "vulca", address: "Calle 5 de Febrero 321, GDL", distance: "1.5 km" },
-  { name: "Restaurant La Parrilla", type: "food", address: "Carr. México-Puebla Km 45", distance: "3.2 km" },
-  { name: "King Long Guadalajara", type: "dealer", address: "Av. López Mateos 890, GDL", distance: "4.7 km" },
-  { name: "Taller Hermanos López", type: "taller", address: "Calle Morelos 567, PUE", distance: "6.3 km" },
-  { name: "Gasolinera Shell Perisur", type: "gas", address: "Periférico Sur 2345, CDMX", distance: "1.1 km" },
+  { name: "King Long CDMX Centro", type: "dealer", address: "Av. Insurgentes Sur 1234, CDMX", lat: 19.3910, lng: -99.1676 },
+  { name: "Taller Certificado Monterrey", type: "taller", address: "Blvd. Constitución 456, MTY", lat: 25.6866, lng: -100.3161 },
+  { name: "Gasolinera BP Reforma", type: "gas", address: "Paseo de la Reforma 789, CDMX", lat: 19.4284, lng: -99.1672 },
+  { name: "Vulcanizadora Express", type: "vulca", address: "Calle 5 de Febrero 321, GDL", lat: 20.6597, lng: -103.3496 },
+  { name: "Restaurant La Parrilla", type: "food", address: "Carr. México-Puebla Km 45", lat: 19.2880, lng: -98.9886 },
+  { name: "King Long Guadalajara", type: "dealer", address: "Av. López Mateos 890, GDL", lat: 20.6736, lng: -103.3440 },
+  { name: "Taller Hermanos López", type: "taller", address: "Calle Morelos 567, PUE", lat: 19.0414, lng: -98.2063 },
+  { name: "Gasolinera Shell Perisur", type: "gas", address: "Periférico Sur 2345, CDMX", lat: 19.3050, lng: -99.1900 },
 ];
 
 const typeIcons: Record<string, typeof MapPin> = {
@@ -39,13 +50,27 @@ const Mapa = () => {
       <h1 className="text-2xl font-bold text-gradient-gold mb-2">Mapa de Servicios</h1>
       <p className="text-muted-foreground mb-4">Encuentra lo que necesitas cerca de ti</p>
 
-      {/* Map placeholder */}
-      <div className="h-44 rounded-xl bg-card border border-border flex items-center justify-center mb-4 overflow-hidden relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-secondary to-muted opacity-50" />
-        <div className="relative text-center">
-          <MapPin className="w-8 h-8 text-primary mx-auto mb-2" />
-          <p className="text-sm text-muted-foreground">Mapa interactivo próximamente</p>
-        </div>
+      {/* Interactive Map */}
+      <div className="h-52 rounded-xl overflow-hidden mb-4 border border-border">
+        <MapContainer
+          center={[20.5, -99.5]}
+          zoom={5}
+          style={{ height: "100%", width: "100%" }}
+          scrollWheelZoom={false}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a>'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          {filtered.map((loc, i) => (
+            <Marker key={i} position={[loc.lat, loc.lng]}>
+              <Popup>
+                <strong>{loc.name}</strong><br />
+                {loc.address}
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
       </div>
 
       {/* Category filters */}
@@ -58,7 +83,7 @@ const Mapa = () => {
               onClick={() => setActive(cat.id)}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 ${
                 active === cat.id
-                  ? "bg-gradient-gold text-primary-foreground shadow-[var(--shadow-gold)]"
+                  ? "bg-gradient-gold text-white shadow-[var(--shadow-gold)]"
                   : "bg-card border border-border text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -82,7 +107,6 @@ const Mapa = () => {
                 <h3 className="font-semibold text-card-foreground text-sm">{loc.name}</h3>
                 <p className="text-xs text-muted-foreground truncate">{loc.address}</p>
               </div>
-              <span className="text-xs text-primary font-semibold whitespace-nowrap">{loc.distance}</span>
             </div>
           );
         })}

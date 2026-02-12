@@ -23,7 +23,7 @@ const Consejos = () => (
           className="group rounded-xl bg-card border border-border overflow-hidden"
         >
           <summary className="flex items-center gap-3 p-4 cursor-pointer list-none">
-            <div className="w-10 h-10 rounded-lg bg-gradient-gold flex items-center justify-center text-primary-foreground flex-shrink-0">
+            <div className="w-10 h-10 rounded-lg bg-gradient-gold flex items-center justify-center text-white flex-shrink-0">
               <Lightbulb className="w-5 h-5" />
             </div>
             <span className="font-semibold text-card-foreground flex-1">{tip.title}</span>

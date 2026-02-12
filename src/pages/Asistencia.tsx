@@ -19,7 +19,7 @@ const Asistencia = () => (
           href={opt.phone}
           className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border hover:border-primary/30 transition-all"
         >
-          <div className="w-14 h-14 rounded-xl bg-gradient-gold flex items-center justify-center text-primary-foreground shadow-[var(--shadow-gold)]">
+          <div className="w-14 h-14 rounded-xl bg-gradient-gold flex items-center justify-center text-white shadow-[var(--shadow-gold)]">
             {opt.icon}
           </div>
           <div>

@@ -11,6 +11,7 @@ import Credito from "./pages/Credito";
 import Consejos from "./pages/Consejos";
 import Gasolina from "./pages/Gasolina";
 import Mapa from "./pages/Mapa";
+import Historia from "./pages/Historia";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/consejos" element={<Consejos />} />
             <Route path="/gasolina" element={<Gasolina />} />
             <Route path="/mapa" element={<Mapa />} />
+            <Route path="/historia" element={<Historia />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <BottomNav />
