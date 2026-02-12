@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import {
   Phone, ShoppingCart, Calculator, Lightbulb,
-  MapPin, Fuel, Wrench, AlertTriangle } from
+  MapPin, Fuel, Wrench, AlertTriangle, BookOpen } from
 "lucide-react";
 import heroImage from "@/assets/hero-minivan.jpg";
+import logo from "@/assets/logo-kinglong.png";
 import ServiceCard from "@/components/ServiceCard";
 
 const quickServices = [
@@ -12,7 +13,8 @@ const quickServices = [
 { icon: <Calculator className="w-5 h-5" />, title: "Simula tu Crédito", desc: "Nueva unidad King Long", path: "/credito" },
 { icon: <Fuel className="w-5 h-5" />, title: "Calculadora Gas", desc: "Calcula tu consumo", path: "/gasolina" },
 { icon: <MapPin className="w-5 h-5" />, title: "Mapa de Servicios", desc: "Talleres, vulcas y más", path: "/mapa" },
-{ icon: <Lightbulb className="w-5 h-5" />, title: "Consejos", desc: "Tips para tu unidad", path: "/consejos" }];
+{ icon: <Lightbulb className="w-5 h-5" />, title: "Consejos", desc: "Tips para tu unidad", path: "/consejos" },
+{ icon: <BookOpen className="w-5 h-5" />, title: "Historia", desc: "Conoce la marca King Long", path: "/historia" }];
 
 
 const Index = () => {
@@ -20,8 +22,13 @@ const Index = () => {
 
   return (
     <div className="min-h-screen pb-20">
+      {/* Logo */}
+      <div className="flex justify-center py-3 bg-background">
+        <img src={logo} alt="King Long División Minivan México" className="h-14 object-contain" />
+      </div>
+
       {/* Hero */}
-      <div className="relative h-56 overflow-hidden">
+      <div className="relative h-48 overflow-hidden">
         <img
           src={heroImage}
           alt="King Long Minivan"
@@ -40,7 +47,7 @@ const Index = () => {
       <div className="px-4 -mt-4 relative z-10">
         <button
           onClick={() => navigate("/asistencia")}
-          className="w-full flex items-center justify-center gap-3 py-4 rounded-xl bg-gradient-gold text-primary-foreground font-bold text-lg shadow-[var(--shadow-gold)] animate-pulse-gold active:scale-[0.98] transition-transform">
+          className="w-full flex items-center justify-center gap-3 py-4 rounded-xl bg-gradient-gold text-white font-bold text-lg shadow-[var(--shadow-gold)] animate-pulse-gold active:scale-[0.98] transition-transform">
 
           <Phone className="w-5 h-5" />
           Asistencia de Emergencia

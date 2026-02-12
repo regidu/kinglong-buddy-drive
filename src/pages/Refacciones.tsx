@@ -59,7 +59,7 @@ const Refacciones = () => {
             </div>
             <div className="flex items-center gap-3">
               <span className="text-primary font-bold">{part.price}</span>
-              <button className="w-9 h-9 rounded-lg bg-gradient-gold flex items-center justify-center text-primary-foreground">
+              <button className="w-9 h-9 rounded-lg bg-gradient-gold flex items-center justify-center text-white">
                 <ShoppingCart className="w-4 h-4" />
               </button>
             </div>

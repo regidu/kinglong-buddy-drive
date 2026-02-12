@@ -127,13 +127,13 @@ export default {
   					transform: 'translateY(0)'
   				}
   			},
-  			'pulse-gold': {
-  				'0%, 100%': {
-  					boxShadow: '0 0 0 0 hsl(40 90% 55% / 0.4)'
-  				},
-  				'50%': {
-  					boxShadow: '0 0 0 12px hsl(40 90% 55% / 0)'
-  				}
+			'pulse-gold': {
+				'0%, 100%': {
+					boxShadow: '0 0 0 0 hsl(0 73% 42% / 0.4)'
+				},
+				'50%': {
+					boxShadow: '0 0 0 12px hsl(0 73% 42% / 0)'
+				}
   			}
   		},
   		animation: {
