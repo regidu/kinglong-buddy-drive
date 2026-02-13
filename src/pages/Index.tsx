@@ -1,32 +1,40 @@
 import { useNavigate } from "react-router-dom";
 import {
   Phone, ShoppingCart, Calculator, Lightbulb,
-  MapPin, Fuel, Wrench, AlertTriangle, BookOpen } from
+  MapPin, Fuel, AlertTriangle, BookOpen, Car, MessageCircle, Bell, LogOut } from
 "lucide-react";
 import heroImage from "@/assets/hero-minivan.jpg";
 import logo from "@/assets/logo-kinglong.png";
 import ServiceCard from "@/components/ServiceCard";
+import { useAuth } from "@/hooks/useAuth";
 
 const quickServices = [
 { icon: <AlertTriangle className="w-5 h-5" />, title: "Asistencia Vial", desc: "Ayuda en el camino 24/7", path: "/asistencia" },
+{ icon: <Car className="w-5 h-5" />, title: "Mi Unidad", desc: "Registra tu VIN", path: "/mi-unidad" },
 { icon: <ShoppingCart className="w-5 h-5" />, title: "Refacciones", desc: "Pide partes originales", path: "/refacciones" },
 { icon: <Calculator className="w-5 h-5" />, title: "Simula tu Crédito", desc: "Nueva unidad King Long", path: "/credito" },
+{ icon: <Bell className="w-5 h-5" />, title: "Recordatorios", desc: "Mantenimiento programado", path: "/recordatorios" },
 { icon: <Fuel className="w-5 h-5" />, title: "Calculadora Gas", desc: "Calcula tu consumo", path: "/gasolina" },
 { icon: <MapPin className="w-5 h-5" />, title: "Mapa de Servicios", desc: "Talleres, vulcas y más", path: "/mapa" },
+{ icon: <MessageCircle className="w-5 h-5" />, title: "Soporte", desc: "Chat con nuestro equipo", path: "/soporte" },
 { icon: <Lightbulb className="w-5 h-5" />, title: "Consejos", desc: "Tips para tu unidad", path: "/consejos" },
 { icon: <BookOpen className="w-5 h-5" />, title: "Historia", desc: "Conoce la marca King Long", path: "/historia" }];
 
 
 const Index = () => {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
 
   return (
-    <div className="min-h-screen pb-20">
-      {/* Logo */}
-      <div className="flex justify-center py-3 bg-background">
+    <div className="min-h-screen pb-20 pt-safe">
+      {/* Logo + Logout */}
+      <div className="flex items-center justify-between px-4 py-3 bg-background">
+        <div />
         <img src={logo} alt="King Long División Minivan México" className="h-14 object-contain" />
+        <button onClick={signOut} className="text-muted-foreground hover:text-primary">
+          <LogOut className="w-5 h-5" />
+        </button>
       </div>
-
       {/* Hero */}
       <div className="relative h-48 overflow-hidden">
         <img
