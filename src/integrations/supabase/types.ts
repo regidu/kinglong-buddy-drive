@@ -14,7 +14,131 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      maintenance_reminders: {
+        Row: {
+          completed: boolean
+          created_at: string
+          description: string | null
+          due_date: string
+          due_km: number | null
+          id: string
+          title: string
+          user_id: string
+          vehicle_id: string
+        }
+        Insert: {
+          completed?: boolean
+          created_at?: string
+          description?: string | null
+          due_date: string
+          due_km?: number | null
+          id?: string
+          title: string
+          user_id: string
+          vehicle_id: string
+        }
+        Update: {
+          completed?: boolean
+          created_at?: string
+          description?: string | null
+          due_date?: string
+          due_km?: number | null
+          id?: string
+          title?: string
+          user_id?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maintenance_reminders_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      support_messages: {
+        Row: {
+          created_at: string
+          id: string
+          is_from_user: boolean
+          message: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_from_user?: boolean
+          message: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_from_user?: boolean
+          message?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      vehicles: {
+        Row: {
+          created_at: string
+          id: string
+          model: string | null
+          nickname: string | null
+          user_id: string
+          vin: string
+          year: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          model?: string | null
+          nickname?: string | null
+          user_id: string
+          vin: string
+          year?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          model?: string | null
+          nickname?: string | null
+          user_id?: string
+          vin?: string
+          year?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

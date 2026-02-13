@@ -2,9 +2,11 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import BottomNav from "@/components/BottomNav";
 import Index from "./pages/Index";
+import Auth from "./pages/Auth";
 import Asistencia from "./pages/Asistencia";
 import Refacciones from "./pages/Refacciones";
 import Credito from "./pages/Credito";
@@ -12,9 +14,44 @@ import Consejos from "./pages/Consejos";
 import Gasolina from "./pages/Gasolina";
 import Mapa from "./pages/Mapa";
 import Historia from "./pages/Historia";
+import MiUnidad from "./pages/MiUnidad";
+import Soporte from "./pages/Soporte";
+import Recordatorios from "./pages/Recordatorios";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
+
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Cargando...</div>;
+  if (!user) return <Navigate to="/auth" replace />;
+  return <>{children}</>;
+};
+
+const AppRoutes = () => {
+  const { user, loading } = useAuth();
+
+  return (
+    <div className="max-w-lg mx-auto min-h-screen relative">
+      <Routes>
+        <Route path="/auth" element={user && !loading ? <Navigate to="/" replace /> : <Auth />} />
+        <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+        <Route path="/asistencia" element={<ProtectedRoute><Asistencia /></ProtectedRoute>} />
+        <Route path="/refacciones" element={<ProtectedRoute><Refacciones /></ProtectedRoute>} />
+        <Route path="/credito" element={<ProtectedRoute><Credito /></ProtectedRoute>} />
+        <Route path="/consejos" element={<ProtectedRoute><Consejos /></ProtectedRoute>} />
+        <Route path="/gasolina" element={<ProtectedRoute><Gasolina /></ProtectedRoute>} />
+        <Route path="/mapa" element={<ProtectedRoute><Mapa /></ProtectedRoute>} />
+        <Route path="/historia" element={<ProtectedRoute><Historia /></ProtectedRoute>} />
+        <Route path="/mi-unidad" element={<ProtectedRoute><MiUnidad /></ProtectedRoute>} />
+        <Route path="/soporte" element={<ProtectedRoute><Soporte /></ProtectedRoute>} />
+        <Route path="/recordatorios" element={<ProtectedRoute><Recordatorios /></ProtectedRoute>} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+      {user && <BottomNav />}
+    </div>
+  );
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -22,20 +59,9 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <div className="max-w-lg mx-auto min-h-screen relative">
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/asistencia" element={<Asistencia />} />
-            <Route path="/refacciones" element={<Refacciones />} />
-            <Route path="/credito" element={<Credito />} />
-            <Route path="/consejos" element={<Consejos />} />
-            <Route path="/gasolina" element={<Gasolina />} />
-            <Route path="/mapa" element={<Mapa />} />
-            <Route path="/historia" element={<Historia />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <BottomNav />
-        </div>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
