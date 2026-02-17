@@ -66,6 +66,18 @@ const Refacciones = () => {
           </div>
         ))}
       </div>
+
+      <div className="mt-6 p-4 rounded-xl bg-card border border-border text-center space-y-2">
+        <p className="text-sm text-muted-foreground">¿Necesitas ayuda con refacciones?</p>
+        <a
+          href="https://wa.me/528712200830?text=Hola, necesito información sobre refacciones King Long"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-gold text-white font-semibold text-sm"
+        >
+          <ShoppingCart className="w-4 h-4" /> Contactar refacciones
+        </a>
+      </div>
     </div>
   );
 };

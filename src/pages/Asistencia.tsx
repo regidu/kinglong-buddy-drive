@@ -1,10 +1,10 @@
 import { Phone, MapPin, AlertTriangle, Truck } from "lucide-react";
 
 const emergencyOptions = [
-  { icon: <Truck className="w-6 h-6" />, title: "Grúa", desc: "Solicitar servicio de grúa", phone: "tel:+525512345678" },
-  { icon: <AlertTriangle className="w-6 h-6" />, title: "Falla Mecánica", desc: "Reportar falla en el camino", phone: "tel:+525512345678" },
-  { icon: <MapPin className="w-6 h-6" />, title: "Llanta Ponchada", desc: "Asistencia para cambio de llanta", phone: "tel:+525512345678" },
-  { icon: <Phone className="w-6 h-6" />, title: "Línea Directa", desc: "Hablar con un asesor", phone: "tel:+525512345678" },
+  { icon: <Truck className="w-6 h-6" />, title: "Grúa", desc: "Solicitar servicio de grúa (ext. 5)", phone: "tel:8005550075,5" },
+  { icon: <AlertTriangle className="w-6 h-6" />, title: "Falla Mecánica", desc: "Reportar falla en el camino", phone: "tel:8005550075" },
+  { icon: <MapPin className="w-6 h-6" />, title: "Llanta Ponchada", desc: "Asistencia para cambio de llanta (ext. 5)", phone: "tel:8005550075,5" },
+  { icon: <Phone className="w-6 h-6" />, title: "Línea Directa", desc: "Hablar con un asesor", phone: "tel:+528711377115" },
 ];
 
 const Asistencia = () => (

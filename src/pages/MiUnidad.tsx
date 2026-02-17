@@ -89,7 +89,7 @@ const MiUnidad = () => {
               <Button onClick={() => setShowForm(true)} className="w-full bg-gradient-gold text-white">
                 <Plus className="w-4 h-4 mr-2" /> Registrar mi unidad (VIN)
               </Button>
-              <Button variant="outline" className="w-full" onClick={() => window.open("https://wa.me/521234567890?text=Hola, me interesa una unidad King Long", "_blank")}>
+              <Button variant="outline" className="w-full" onClick={() => window.open("https://wa.me/528712196410?text=Hola, me interesa una unidad King Long", "_blank")}>
                 <Phone className="w-4 h-4 mr-2" /> Hablar con un asesor de ventas
               </Button>
             </div>
