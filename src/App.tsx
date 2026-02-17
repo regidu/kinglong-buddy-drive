@@ -7,6 +7,8 @@ import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import BottomNav from "@/components/BottomNav";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Asistencia from "./pages/Asistencia";
 import Refacciones from "./pages/Refacciones";
 import Credito from "./pages/Credito";
@@ -17,6 +19,10 @@ import Historia from "./pages/Historia";
 import MiUnidad from "./pages/MiUnidad";
 import Soporte from "./pages/Soporte";
 import Recordatorios from "./pages/Recordatorios";
+import Perfil from "./pages/Perfil";
+import Terminos from "./pages/Terminos";
+import Garantias from "./pages/Garantias";
+import Sugerencias from "./pages/Sugerencias";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,6 +41,9 @@ const AppRoutes = () => {
     <div className="max-w-lg mx-auto min-h-screen relative">
       <Routes>
         <Route path="/auth" element={user && !loading ? <Navigate to="/" replace /> : <Auth />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/terminos" element={<Terminos />} />
         <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
         <Route path="/asistencia" element={<ProtectedRoute><Asistencia /></ProtectedRoute>} />
         <Route path="/refacciones" element={<ProtectedRoute><Refacciones /></ProtectedRoute>} />
@@ -46,6 +55,9 @@ const AppRoutes = () => {
         <Route path="/mi-unidad" element={<ProtectedRoute><MiUnidad /></ProtectedRoute>} />
         <Route path="/soporte" element={<ProtectedRoute><Soporte /></ProtectedRoute>} />
         <Route path="/recordatorios" element={<ProtectedRoute><Recordatorios /></ProtectedRoute>} />
+        <Route path="/perfil" element={<ProtectedRoute><Perfil /></ProtectedRoute>} />
+        <Route path="/garantias" element={<ProtectedRoute><Garantias /></ProtectedRoute>} />
+        <Route path="/sugerencias" element={<ProtectedRoute><Sugerencias /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {user && <BottomNav />}

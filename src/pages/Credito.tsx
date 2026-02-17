@@ -4,7 +4,7 @@ const Credito = () => {
   const [monto, setMonto] = useState(500000);
   const [enganche, setEnganche] = useState(20);
   const [plazo, setPlazo] = useState(36);
-  const tasa = 14.5;
+  const [tasa, setTasa] = useState(14.5);
 
   const montoFinanciado = monto * (1 - enganche / 100);
   const tasaMensual = tasa / 100 / 12;
@@ -29,7 +29,7 @@ const Credito = () => {
           </div>
           <input
             type="range"
-            min={300000}
+            min={450000}
             max={2000000}
             step={50000}
             value={monto}
@@ -37,7 +37,7 @@ const Credito = () => {
             className="w-full accent-primary"
           />
           <div className="flex justify-between text-xs text-muted-foreground mt-1">
-            <span>$300K</span><span>$2M</span>
+            <span>$450K</span><span>$2M</span>
           </div>
         </div>
 
@@ -49,15 +49,15 @@ const Credito = () => {
           </div>
           <input
             type="range"
-            min={10}
-            max={50}
+            min={20}
+            max={80}
             step={5}
             value={enganche}
             onChange={(e) => setEnganche(Number(e.target.value))}
             className="w-full accent-primary"
           />
           <div className="flex justify-between text-xs text-muted-foreground mt-1">
-            <span>10%</span><span>50%</span>
+            <span>20%</span><span>80%</span>
           </div>
         </div>
 
@@ -81,6 +81,26 @@ const Credito = () => {
                 {p}
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* Tasa de interés */}
+        <div>
+          <div className="flex justify-between mb-2">
+            <label className="text-sm font-medium text-foreground">Tasa de interés anual</label>
+            <span className="text-primary font-bold">{tasa}%</span>
+          </div>
+          <input
+            type="range"
+            min={8}
+            max={25}
+            step={0.5}
+            value={tasa}
+            onChange={(e) => setTasa(Number(e.target.value))}
+            className="w-full accent-primary"
+          />
+          <div className="flex justify-between text-xs text-muted-foreground mt-1">
+            <span>8%</span><span>25%</span>
           </div>
         </div>
 
