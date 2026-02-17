@@ -72,6 +72,12 @@ const Gasolina = () => {
           </div>
         )}
       </div>
+
+      <div className="mt-6 p-3 rounded-lg bg-muted border border-border">
+        <p className="text-xs text-muted-foreground">
+          ⚠️ <strong>Aviso:</strong> Esta calculadora ofrece únicamente una estimación. El consumo real puede variar dependiendo del peso de la carga, condiciones climáticas, temperatura, estado de la carretera, estilo de conducción y otros factores. King Long no se hace responsable de diferencias entre la estimación y el consumo real.
+        </p>
+      </div>
     </div>
   );
 };

@@ -6,53 +6,53 @@
 
 @layer base {
   :root {
-    --background: 220 20% 10%;
-    --foreground: 40 20% 95%;
+    --background: 0 0% 100%;
+    --foreground: 220 20% 15%;
 
-    --card: 220 18% 14%;
-    --card-foreground: 40 20% 95%;
+    --card: 0 0% 98%;
+    --card-foreground: 220 20% 15%;
 
-    --popover: 220 18% 14%;
-    --popover-foreground: 40 20% 95%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 20% 15%;
 
     --primary: 0 73.7089% 41.7647%;
-    --primary-foreground: 220 20% 8%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 98.0392%;
-    --secondary-foreground: 40 20% 90%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 20% 25%;
 
-    --muted: 220 15% 18%;
-    --muted-foreground: 220 10% 55%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 45%;
 
     --accent: 0 72.2222% 50.5882%;
-    --accent-foreground: 220 20% 8%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 22%;
-    --input: 220 15% 22%;
+    --border: 220 13% 88%;
+    --input: 220 13% 88%;
     --ring: 0 73% 42%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 220 20% 8%;
-    --sidebar-foreground: 40 20% 95%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 220 20% 15%;
     --sidebar-primary: 0 73% 42%;
-    --sidebar-primary-foreground: 220 20% 8%;
-    --sidebar-accent: 220 15% 18%;
-    --sidebar-accent-foreground: 40 20% 95%;
-    --sidebar-border: 220 15% 22%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 96%;
+    --sidebar-accent-foreground: 220 20% 15%;
+    --sidebar-border: 220 13% 88%;
     --sidebar-ring: 0 73% 42%;
 
     /* Custom tokens */
     --gold: 0 73% 42%;
     --gold-dim: 0 60% 35%;
-    --surface: 220 18% 14%;
-    --surface-hover: 220 16% 18%;
+    --surface: 0 0% 97%;
+    --surface-hover: 0 0% 95%;
     --gradient-gold: linear-gradient(135deg, hsl(0, 73%, 42%), hsl(0, 80%, 35%));
     --shadow-gold: 0 4px 20px -4px hsl(0 73% 42% / 0.35);
-    --shadow-card: 0 4px 24px -8px hsl(0 0% 0% / 0.4);
+    --shadow-card: 0 2px 12px -4px hsl(0 0% 0% / 0.1);
   }
 
   * {
@@ -91,8 +91,7 @@
   }
 
   .glass-card {
-    background: hsl(220, 18%, 14% / 0.8);
-    backdrop-filter: blur(12px);
-    border: 1px solid hsl(220, 15%, 22% / 0.5);
+    background: hsl(0, 0%, 98%);
+    border: 1px solid hsl(220, 13%, 88%);
   }
 }

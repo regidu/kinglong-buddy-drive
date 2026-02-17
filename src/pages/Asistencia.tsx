@@ -10,7 +10,10 @@ const emergencyOptions = [
 const Asistencia = () => (
   <div className="min-h-screen pb-20 px-4 pt-6">
     <h1 className="text-2xl font-bold text-gradient-gold mb-2">Asistencia Vial</h1>
-    <p className="text-muted-foreground mb-6">Disponible 24/7 para ayudarte en el camino</p>
+    <p className="text-muted-foreground mb-2">Disponible 24/7 para ayudarte en el camino</p>
+    <div className="mb-6 p-3 rounded-lg bg-primary/10 border border-primary/20">
+      <p className="text-xs text-primary font-medium">⚠️ Servicio disponible únicamente para modelos 2025 en adelante.</p>
+    </div>
 
     <div className="space-y-3">
       {emergencyOptions.map((opt) => (
