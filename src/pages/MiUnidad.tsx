@@ -100,7 +100,15 @@ const MiUnidad = () => {
           <form onSubmit={addVehicle} className="glass-card rounded-xl p-4 space-y-3">
             <h3 className="font-semibold text-foreground">Registrar Unidad</h3>
             <Input placeholder="Número VIN *" value={vin} onChange={(e) => setVin(e.target.value)} required maxLength={17} minLength={17} />
-            <Input placeholder="Modelo (ej: King Long C10)" value={model} onChange={(e) => setModel(e.target.value)} />
+            <select value={model} onChange={(e) => setModel(e.target.value)} className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm text-foreground">
+              <option value="">Selecciona modelo</option>
+              <option value="Cargo A/A">Cargo A/A</option>
+              <option value="Panel Ventanas">Panel Ventanas</option>
+              <option value="Panel Ventanas A/A">Panel Ventanas A/A</option>
+              <option value="Equipada 16 Pasajeros">Equipada 16 Pasajeros</option>
+              <option value="Kingo EV">Kingo EV</option>
+              <option value="Semi Equipada">Semi Equipada</option>
+            </select>
             <Input placeholder="Año" type="number" value={year} onChange={(e) => setYear(e.target.value)} />
             <Input placeholder="Apodo (ej: Mi Reina)" value={nickname} onChange={(e) => setNickname(e.target.value)} />
             <div className="flex gap-2">

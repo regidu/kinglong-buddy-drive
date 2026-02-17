@@ -3,8 +3,27 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bell, Plus, Check, Calendar, Car } from "lucide-react";
+import { Bell, Plus, Check, Calendar, Car, Download } from "lucide-react";
 import { toast } from "sonner";
+
+const generateICS = (r: { title: string; description: string | null; due_date: string }) => {
+  const date = r.due_date.replace(/-/g, "");
+  const ics = `BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:${date}
+SUMMARY:${r.title}
+DESCRIPTION:${r.description || "Recordatorio King Long"}
+END:VEVENT
+END:VCALENDAR`;
+  const blob = new Blob([ics], { type: "text/calendar" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${r.title.replace(/\s/g, "_")}.ics`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
 
 interface Vehicle { id: string; nickname: string | null; model: string | null; }
 interface Reminder {
@@ -135,6 +154,9 @@ const Recordatorios = () => {
                   {r.due_km && <span className="text-muted-foreground">{r.due_km.toLocaleString()} km</span>}
                 </div>
               </div>
+              <button onClick={() => generateICS(r)} className="text-muted-foreground hover:text-primary shrink-0" title="Agregar al calendario">
+                <Download className="w-4 h-4" />
+              </button>
             </div>
           ))}
         </div>
