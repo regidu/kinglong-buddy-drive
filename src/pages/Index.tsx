@@ -15,6 +15,7 @@ import hero7 from "@/assets/hero-7.png";
 import logo from "@/assets/logo-kinglong.png";
 import ServiceCard from "@/components/ServiceCard";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const heroImages = [heroImage, hero1, hero2, hero3, hero4, hero5, hero6, hero7];
 
@@ -43,8 +44,17 @@ const novedades = [
 
 const Index = () => {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const [currentImage, setCurrentImage] = useState(0);
+  const [avatar, setAvatar] = useState<string | null>(null);
+  const [avatarBg, setAvatarBg] = useState("bg-red-100");
+
+  useEffect(() => {
+    if (user) {
+      setAvatar(user.user_metadata?.avatar || null);
+      setAvatarBg(user.user_metadata?.avatar_bg || "bg-red-100");
+    }
+  }, [user]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -70,7 +80,11 @@ const Index = () => {
       {/* Logo + Profile + Logout */}
       <div className="flex items-center justify-between px-4 py-3 bg-background">
         <button onClick={() => navigate("/perfil")} className="text-muted-foreground hover:text-primary">
-          <UserCircle className="w-6 h-6" />
+          {avatar ? (
+            <div className={`w-8 h-8 rounded-full ${avatarBg} flex items-center justify-center text-lg`}>{avatar}</div>
+          ) : (
+            <UserCircle className="w-6 h-6" />
+          )}
         </button>
         <img src={logo} alt="King Long División Minivan México" className="h-14 object-contain" />
         <button onClick={signOut} className="text-muted-foreground hover:text-primary">

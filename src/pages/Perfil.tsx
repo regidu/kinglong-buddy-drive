@@ -89,10 +89,15 @@ const Perfil = () => {
 
       {/* Avatar */}
       <div className="flex flex-col items-center mb-6">
-        <div className={`w-20 h-20 rounded-full ${avatarBg} flex items-center justify-center text-4xl mb-3 ring-2 ring-offset-2 ring-primary/30`}>
-          {avatar}
+        <div className={`w-20 h-20 rounded-full ${avatar ? avatarBg : "bg-muted"} flex items-center justify-center text-4xl mb-3 ring-2 ring-offset-2 ring-primary/30`}>
+          {avatar || <User className="w-10 h-10 text-muted-foreground" />}
         </div>
-        <p className="text-sm font-medium text-foreground mb-2">Elige tu avatar</p>
+        <div className="flex items-center gap-3 mb-2">
+          <p className="text-sm font-medium text-foreground">Elige tu avatar</p>
+          {avatar && (
+            <button onClick={() => setAvatar("")} className="text-xs text-destructive hover:underline">Quitar avatar</button>
+          )}
+        </div>
         <div className="flex flex-wrap justify-center gap-2 mb-3">
           {animalAvatars.map((a) => (
             <button

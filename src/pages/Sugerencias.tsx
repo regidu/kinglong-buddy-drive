@@ -18,7 +18,7 @@ const StarRating = ({ value, onChange }: { value: number; onChange: (v: number) 
   <div className="flex gap-1">
     {[1, 2, 3, 4, 5].map((s) => (
       <button key={s} type="button" onClick={() => onChange(s)} className="p-0.5">
-        <Star className={`w-6 h-6 transition-colors ${s <= value ? "fill-primary text-primary" : "text-border"}`} />
+        <Star className={`w-6 h-6 transition-colors ${s <= value ? "fill-yellow-400 text-yellow-400" : "text-border"}`} />
       </button>
     ))}
   </div>
