@@ -1,12 +1,39 @@
 import { Shield, Phone } from "lucide-react";
 
-const warranties = [
-  { title: "Motor y tren motriz", coverage: "5 años o 100,000 km", desc: "Cubre motor, transmisión y componentes principales del tren motriz." },
-  { title: "Carrocería y pintura", coverage: "3 años", desc: "Protección contra defectos de fabricación en carrocería y pintura." },
-  { title: "Sistema eléctrico", coverage: "2 años o 50,000 km", desc: "Cubre arneses, alternador, módulos electrónicos y componentes eléctricos." },
-  { title: "Suspensión y dirección", coverage: "2 años o 50,000 km", desc: "Amortiguadores, rótulas, brazos de dirección y componentes relacionados." },
-  { title: "Aire acondicionado", coverage: "1 año o 20,000 km", desc: "Compresor, condensador y sistema de climatización." },
-  { title: "Accesorios y acabados interiores", coverage: "1 año", desc: "Asientos, tapicería, panel de instrumentos y accesorios internos." },
+const coverageGroups = [
+  {
+    period: "3 meses u 8,000 km",
+    items: [
+      "Marcha de ignición", "Amortiguadores", "Balatas de frenos", "Bandas", "Baterías",
+      "Baleros", "Relevadores", "Fusibles", "Filtros", "Focos", "Compresor de AC",
+      "Motor de limpiaparabrisas", "Pluma de limpiaparabrisas", "Bomba de chisgueteros",
+      "Alineación", "Balanceo de ruedas", "Ruidos de suspensión", "Habitáculo", "Bomba de combustible",
+    ],
+  },
+  {
+    period: "12 meses o 30,000 km",
+    items: [
+      "Alternador", "Sellos de aceite", "Componentes de suspensión", "Micas", "Faros",
+      "Collarín y componentes", "Inyectores", "Radiador", "Soporte de radiador", "Barras",
+      "Termostato", "Mecanismo de asientos (no incluye daños provocados como: cortes, manchas o rupturas)",
+      "Válvulas eléctricas (componentes eléctricos)", "Potenciómetros", "Sensor de reversa",
+      "Elevador de cristales", "Puertos USB", "Moto ventiladores", "Resistencias de AC",
+      "Interruptores (luces, direccionales, intermitentes, etc.)", "Corrosión por pintura",
+      "Crucetas (por defecto de fabricación y no de desgaste natural)",
+    ],
+  },
+  {
+    period: "24 meses o 120,000 km",
+    items: ["Válvulas de motor y diferencial"],
+  },
+  {
+    period: "3 años o 120,000 km",
+    items: [
+      "Componentes de motor (con excepción de válvulas)",
+      "Transmisión",
+      "ECU (por defecto de fabricación y no de algún desgaste natural)",
+    ],
+  },
 ];
 
 const Garantias = () => (
@@ -14,7 +41,7 @@ const Garantias = () => (
     <h1 className="text-2xl font-bold text-gradient-gold mb-2 flex items-center gap-2">
       <Shield className="w-6 h-6" /> Garantías
     </h1>
-    <p className="text-muted-foreground mb-6">Conoce la cobertura de tu unidad King Long</p>
+    <p className="text-muted-foreground mb-6">Cobertura oficial de tu unidad King Long</p>
 
     <a
       href="tel:8005550075,2"
@@ -25,21 +52,29 @@ const Garantias = () => (
     </a>
     <p className="text-xs text-muted-foreground text-center mb-6">800 555 0075 ext. 2</p>
 
-    <div className="space-y-3">
-      {warranties.map((w) => (
-        <div key={w.title} className="p-4 rounded-xl bg-card border border-border">
-          <div className="flex items-center justify-between mb-1">
-            <h3 className="font-semibold text-card-foreground">{w.title}</h3>
-            <span className="text-xs font-bold text-primary">{w.coverage}</span>
+    <div className="space-y-4">
+      {coverageGroups.map((g) => (
+        <div key={g.period} className="rounded-xl bg-card border border-border overflow-hidden">
+          <div className="px-4 py-3 bg-primary/5 border-b border-border">
+            <h3 className="font-bold text-primary text-sm">Cobertura: {g.period}</h3>
           </div>
-          <p className="text-sm text-muted-foreground">{w.desc}</p>
+          <ul className="px-4 py-3 space-y-1.5">
+            {g.items.map((item) => (
+              <li key={item} className="text-sm text-card-foreground flex items-start gap-2">
+                <span className="text-primary mt-1 shrink-0">•</span>
+                {item}
+              </li>
+            ))}
+          </ul>
         </div>
       ))}
     </div>
 
-    <p className="text-xs text-muted-foreground text-center mt-6 italic">
-      * Esta información es preliminar y será actualizada con los datos oficiales de garantía.
-    </p>
+    <div className="mt-6 p-4 rounded-xl bg-primary/5 border border-primary/20">
+      <p className="text-xs text-muted-foreground leading-relaxed">
+        <strong className="text-foreground">Aviso importante:</strong> La aplicación de cada garantía está sujeta al dictamen técnico del taller autorizado King Long correspondiente. Cada caso es evaluado de forma individual conforme a las condiciones de uso, mantenimiento y desgaste de la unidad. King Long México se reserva el derecho de determinar la procedencia de cada reclamación de garantía.
+      </p>
+    </div>
   </div>
 );
 
