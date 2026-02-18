@@ -92,7 +92,7 @@ const Recordatorios = () => {
 
   return (
     <div className="min-h-screen pb-24 pt-safe">
-      <div className="px-4 py-4 space-y-4">
+      <div className="px-4 pt-4 pb-4 space-y-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Bell className="w-6 h-6 text-primary" />
@@ -103,9 +103,9 @@ const Recordatorios = () => {
           </Button>
         </div>
 
-        <div className="p-3 rounded-xl bg-primary/5 border border-primary/20">
-          <p className="text-xs text-muted-foreground leading-relaxed flex items-start gap-2">
-            <Download className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+        <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 flex items-start gap-2">
+          <Download className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+          <p className="text-xs text-muted-foreground leading-relaxed">
             Toca el icono <strong className="text-primary">↓</strong> en cada recordatorio para guardarlo en el calendario de tu celular.
           </p>
         </div>

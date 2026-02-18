@@ -102,7 +102,8 @@ const MiUnidad = () => {
         {showForm && (
           <form onSubmit={addVehicle} className="glass-card rounded-xl p-4 space-y-3">
             <h3 className="font-semibold text-foreground">Registrar Unidad</h3>
-            <Input placeholder="Número VIN *" value={vin} onChange={(e) => setVin(e.target.value)} required maxLength={17} minLength={17} />
+            <Input placeholder="Número VIN (17 caracteres) *" value={vin} onChange={(e) => setVin(e.target.value)} required maxLength={17} minLength={17} />
+            <p className="text-xs text-muted-foreground -mt-2 ml-1">💡 El VIN se encuentra en la placa metálica del lado del copiloto (parte baja del parabrisas) o en la etiqueta de la puerta del conductor.</p>
             <select value={model} onChange={(e) => setModel(e.target.value)} className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm text-foreground">
               <option value="">Selecciona modelo</option>
               <option value="Cargo A/A">Cargo A/A</option>
