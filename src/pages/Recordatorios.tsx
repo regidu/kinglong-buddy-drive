@@ -103,6 +103,13 @@ const Recordatorios = () => {
           </Button>
         </div>
 
+        <div className="p-3 rounded-xl bg-primary/5 border border-primary/20">
+          <p className="text-xs text-muted-foreground leading-relaxed flex items-start gap-2">
+            <Download className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+            Toca el icono <strong className="text-primary">↓</strong> en cada recordatorio para guardarlo en el calendario de tu celular.
+          </p>
+        </div>
+
         {vehicles.length === 0 && (
           <div className="glass-card rounded-xl p-4 text-center text-muted-foreground text-sm">
             <Car className="w-8 h-8 mx-auto mb-2 opacity-50" />

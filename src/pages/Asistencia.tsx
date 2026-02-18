@@ -11,8 +11,14 @@ const Asistencia = () => (
   <div className="min-h-screen pb-20 px-4 pt-6">
     <h1 className="text-2xl font-bold text-gradient-gold mb-2">Asistencia Vial</h1>
     <p className="text-muted-foreground mb-2">Disponible 24/7 para ayudarte en el camino</p>
-    <div className="mb-6 p-3 rounded-lg bg-primary/10 border border-primary/20">
-      <p className="text-xs text-primary font-medium">⚠️ Servicio disponible únicamente para modelos 2025 en adelante.</p>
+
+    <div className="mb-6 p-3 rounded-xl bg-primary/5 border border-primary/20 space-y-1.5">
+      <p className="text-xs text-primary font-bold">⚠️ Condiciones del servicio:</p>
+      <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+        <li>Disponible únicamente para modelos <strong>2025 en adelante</strong>.</li>
+        <li>Máximo <strong>2 servicios de grúa al año</strong>.</li>
+        <li>Cobertura de hasta <strong>100 km de distancia</strong>.</li>
+      </ul>
     </div>
 
     <div className="space-y-3">

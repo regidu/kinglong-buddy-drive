@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   Phone, ShoppingCart, Calculator, Lightbulb,
-  MapPin, Fuel, AlertTriangle, BookOpen, Car, MessageCircle, Bell, LogOut, Shield, UserCircle, MessageSquare, Handshake, Megaphone
+  MapPin, Fuel, AlertTriangle, BookOpen, Car, MessageCircle, Bell, LogOut, Shield, UserCircle, MessageSquare, Handshake, Megaphone, FileText
 } from "lucide-react";
 import heroImage from "@/assets/hero-minivan.jpg";
 import hero1 from "@/assets/hero-1.png";
@@ -21,15 +21,18 @@ const heroImages = [heroImage, hero1, hero2, hero3, hero4, hero5, hero6, hero7];
 const quickServices = [
   { icon: <AlertTriangle className="w-5 h-5" />, title: "Asistencia Vial", desc: "Ayuda en el camino 24/7", path: "/asistencia" },
   { icon: <Car className="w-5 h-5" />, title: "Mi Unidad", desc: "Registra tu VIN", path: "/mi-unidad" },
+  { icon: <Shield className="w-5 h-5" />, title: "Garantías", desc: "Reportar falla", path: "/garantias" },
   { icon: <ShoppingCart className="w-5 h-5" />, title: "Refacciones", desc: "Pide partes originales", path: "/refacciones" },
-  { icon: <Calculator className="w-5 h-5" />, title: "Simula tu Crédito", desc: "Nueva unidad King Long", path: "/credito" },
   { icon: <Bell className="w-5 h-5" />, title: "Recordatorios", desc: "Mantenimiento programado", path: "/recordatorios" },
+  { icon: <FileText className="w-5 h-5" />, title: "Manual de Uso", desc: "Programa de mantenimiento", path: "/manual" },
+  { icon: <Calculator className="w-5 h-5" />, title: "Simula tu Crédito", desc: "Nueva unidad King Long", path: "/credito" },
   { icon: <Fuel className="w-5 h-5" />, title: "Calculadora Gas", desc: "Calcula tu consumo", path: "/gasolina" },
   { icon: <MapPin className="w-5 h-5" />, title: "Mapa de Servicios", desc: "Talleres, vulcas y más", path: "/mapa" },
   { icon: <MessageCircle className="w-5 h-5" />, title: "Soporte", desc: "Chat con nuestro equipo", path: "/soporte" },
   { icon: <Lightbulb className="w-5 h-5" />, title: "Consejos", desc: "Tips para tu unidad", path: "/consejos" },
   { icon: <BookOpen className="w-5 h-5" />, title: "Historia", desc: "Conoce la marca King Long", path: "/historia" },
   { icon: <MessageSquare className="w-5 h-5" />, title: "Sugerencias", desc: "Déjanos tu opinión", path: "/sugerencias" },
+  { icon: <Handshake className="w-5 h-5" />, title: "Sé Distribuidor", desc: "Únete a la red King Long", path: "https://kinglong.mx/distri/distribuidores.html?srsltid=AfmBOoql9BYW0GU0BXHqN8BxDJ7oI7mNs4A8fZbFbT7Nmr1330RWafTn", external: true },
 ];
 
 const novedades = [
@@ -49,6 +52,18 @@ const Index = () => {
     }, 4000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleServiceClick = (s: typeof quickServices[0]) => {
+    if ((s as any).external) {
+      window.open(s.path, "_blank", "noopener,noreferrer");
+    } else {
+      navigate(s.path);
+    }
+  };
+
+  const handleNovedadClick = () => {
+    window.open("https://wa.me/528712196410?text=Hola, me interesa conocer más sobre las novedades King Long", "_blank");
+  };
 
   return (
     <div className="min-h-screen pb-20 pt-safe bg-background">
@@ -80,7 +95,6 @@ const Index = () => {
           </h1>
           <p className="text-sm text-foreground/80 mt-1">Tu compañero de viaje</p>
         </div>
-        {/* Dots */}
         <div className="absolute bottom-2 right-4 flex gap-1">
           {heroImages.map((_, i) => (
             <button key={i} onClick={() => setCurrentImage(i)} className={`w-2 h-2 rounded-full transition-all ${i === currentImage ? "bg-primary w-4" : "bg-foreground/30"}`} />
@@ -99,30 +113,6 @@ const Index = () => {
         </button>
       </div>
 
-      {/* Warranty Button */}
-      <div className="px-4 mt-3">
-        <button
-          onClick={() => navigate("/garantias")}
-          className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border-2 border-primary text-primary font-semibold active:scale-[0.98] transition-transform"
-        >
-          <Shield className="w-5 h-5" />
-          Garantía – Reportar falla
-        </button>
-      </div>
-
-      {/* Distributor Button */}
-      <div className="px-4 mt-3">
-        <a
-          href="https://kinglong.mx/distri/distribuidores.html?srsltid=AfmBOoql9BYW0GU0BXHqN8BxDJ7oI7mNs4A8fZbFbT7Nmr1330RWafTn"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border-2 border-accent text-accent font-semibold active:scale-[0.98] transition-transform"
-        >
-          <Handshake className="w-5 h-5" />
-          Sé Distribuidor King Long
-        </a>
-      </div>
-
       {/* Novedades y Ofertas */}
       <div className="px-4 mt-6 space-y-3">
         <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -131,13 +121,13 @@ const Index = () => {
         </h2>
         <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
           {novedades.map((n, i) => (
-            <div key={i} className="min-w-[240px] p-4 rounded-xl border border-border bg-card space-y-1">
+            <button key={i} onClick={handleNovedadClick} className="min-w-[240px] p-4 rounded-xl border border-border bg-card space-y-1 text-left active:scale-[0.98] transition-transform">
               <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${n.tag === "Novedad" ? "bg-primary/10 text-primary" : "bg-accent/10 text-accent"}`}>
                 {n.tag}
               </span>
               <h3 className="font-semibold text-card-foreground text-sm">{n.title}</h3>
               <p className="text-xs text-muted-foreground">{n.desc}</p>
-            </div>
+            </button>
           ))}
         </div>
       </div>
@@ -152,7 +142,7 @@ const Index = () => {
               icon={s.icon}
               title={s.title}
               description={s.desc}
-              onClick={() => navigate(s.path)}
+              onClick={() => handleServiceClick(s)}
               compact
             />
           ))}

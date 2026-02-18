@@ -15,6 +15,9 @@ interface Vehicle {
   nickname: string | null;
 }
 
+const currentYear = new Date().getFullYear();
+const yearOptions = Array.from({ length: currentYear - 2022 + 1 }, (_, i) => 2022 + i);
+
 const MiUnidad = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -109,7 +112,12 @@ const MiUnidad = () => {
               <option value="Kingo EV">Kingo EV</option>
               <option value="Semi Equipada">Semi Equipada</option>
             </select>
-            <Input placeholder="Año" type="number" value={year} onChange={(e) => setYear(e.target.value)} />
+            <select value={year} onChange={(e) => setYear(e.target.value)} className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm text-foreground">
+              <option value="">Selecciona año</option>
+              {yearOptions.map((y) => (
+                <option key={y} value={y}>{y}</option>
+              ))}
+            </select>
             <Input placeholder="Apodo (ej: Mi Reina)" value={nickname} onChange={(e) => setNickname(e.target.value)} />
             <div className="flex gap-2">
               <Button type="submit" className="flex-1 bg-gradient-gold text-white">Registrar</Button>
