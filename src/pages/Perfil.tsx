@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { User, Lock, Eye, EyeOff, Save, Cake } from "lucide-react";
+import { User, Lock, Eye, EyeOff, Save, Cake, Check, X } from "lucide-react";
 import { toast } from "sonner";
 
 const animalAvatars = [
@@ -32,6 +32,14 @@ const bgColors = [
   { value: "bg-gray-100", label: "Gris", ring: "ring-gray-300" },
 ];
 
+const passwordRules = [
+  { label: "Mínimo 8 caracteres", test: (p: string) => p.length >= 8 },
+  { label: "Una letra mayúscula", test: (p: string) => /[A-Z]/.test(p) },
+  { label: "Una letra minúscula", test: (p: string) => /[a-z]/.test(p) },
+  { label: "Un número", test: (p: string) => /\d/.test(p) },
+  { label: "Un carácter especial", test: (p: string) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(p) },
+];
+
 const Perfil = () => {
   const { user } = useAuth();
   const [fullName, setFullName] = useState("");
@@ -43,8 +51,12 @@ const Perfil = () => {
 
   const [showPwSection, setShowPwSection] = useState(false);
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [pwLoading, setPwLoading] = useState(false);
+
+  const allRulesPass = passwordRules.every((r) => r.test(newPassword));
+  const passwordsMatch = newPassword === confirmPassword && confirmPassword.length > 0;
 
   useEffect(() => {
     if (!user) return;
@@ -69,13 +81,15 @@ const Perfil = () => {
   };
 
   const changePassword = async () => {
-    if (newPassword.length < 8) { toast.error("Mínimo 8 caracteres"); return; }
+    if (!allRulesPass) { toast.error("La contraseña no cumple los requisitos"); return; }
+    if (!passwordsMatch) { toast.error("Las contraseñas no coinciden"); return; }
     setPwLoading(true);
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     setPwLoading(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Contraseña actualizada");
     setNewPassword("");
+    setConfirmPassword("");
     setShowPwSection(false);
   };
 
@@ -166,7 +180,35 @@ const Perfil = () => {
                   {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              <Button onClick={changePassword} disabled={pwLoading} variant="outline" className="w-full">
+              <div className="relative">
+                <Input
+                  type={showPw ? "text" : "password"}
+                  placeholder="Confirmar contraseña"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="pr-10"
+                  minLength={8}
+                />
+                {confirmPassword.length > 0 && (
+                  <span className="absolute right-3 top-3">
+                    {passwordsMatch ? <Check className="w-4 h-4 text-green-500" /> : <X className="w-4 h-4 text-destructive" />}
+                  </span>
+                )}
+              </div>
+              {newPassword.length > 0 && (
+                <div className="space-y-1 text-xs">
+                  {passwordRules.map((rule) => {
+                    const pass = rule.test(newPassword);
+                    return (
+                      <div key={rule.label} className={`flex items-center gap-1.5 ${pass ? "text-green-500" : "text-muted-foreground"}`}>
+                        {pass ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}
+                        {rule.label}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              <Button onClick={changePassword} disabled={pwLoading || !allRulesPass || !passwordsMatch} variant="outline" className="w-full">
                 {pwLoading ? "Guardando..." : "Actualizar contraseña"}
               </Button>
             </div>

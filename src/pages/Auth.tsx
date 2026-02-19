@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Mail, Lock, User, LogIn, Eye, EyeOff, Check, X } from "lucide-react";
+import { Mail, Lock, User, LogIn, Eye, EyeOff, Check, X, Phone } from "lucide-react";
 import logo from "@/assets/logo-kinglong.png";
 import { toast } from "sonner";
 
@@ -19,18 +19,25 @@ const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const allRulesPass = passwordRules.every((r) => r.test(password));
+  const passwordsMatch = password === confirmPassword;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLogin && !allRulesPass) {
       toast.error("La contraseña no cumple los requisitos de seguridad");
+      return;
+    }
+    if (!isLogin && !passwordsMatch) {
+      toast.error("Las contraseñas no coinciden");
       return;
     }
     if (!isLogin && !acceptTerms) {
@@ -50,7 +57,7 @@ const Auth = () => {
           email,
           password,
           options: {
-            data: { full_name: fullName },
+            data: { full_name: fullName, phone },
             emailRedirectTo: window.location.origin,
           },
         });
@@ -80,16 +87,29 @@ const Auth = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
-            <div className="relative">
-              <User className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Nombre completo"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="pl-10"
-                required={!isLogin}
-              />
-            </div>
+            <>
+              <div className="relative">
+                <User className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Nombre completo"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="pl-10"
+                  required
+                />
+              </div>
+              <div className="relative">
+                <Phone className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                <Input
+                  type="tel"
+                  placeholder="Teléfono de contacto"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="pl-10"
+                  required
+                />
+              </div>
+            </>
           )}
 
           <div className="relative">
@@ -124,6 +144,26 @@ const Auth = () => {
             </button>
           </div>
 
+          {!isLogin && (
+            <div className="relative">
+              <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+              <Input
+                type={showPassword ? "text" : "password"}
+                placeholder="Confirmar contraseña"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="pl-10"
+                required
+                minLength={8}
+              />
+              {confirmPassword.length > 0 && (
+                <span className="absolute right-3 top-3">
+                  {passwordsMatch ? <Check className="w-4 h-4 text-green-500" /> : <X className="w-4 h-4 text-destructive" />}
+                </span>
+              )}
+            </div>
+          )}
+
           {!isLogin && password.length > 0 && (
             <div className="space-y-1 text-xs">
               {passwordRules.map((rule) => {
@@ -155,7 +195,7 @@ const Auth = () => {
             </label>
           )}
 
-          <Button type="submit" className="w-full bg-gradient-gold text-white font-semibold" disabled={loading || (!isLogin && (!allRulesPass || !acceptTerms))}>
+          <Button type="submit" className="w-full bg-gradient-gold text-white font-semibold" disabled={loading || (!isLogin && (!allRulesPass || !acceptTerms || !passwordsMatch))}>
             <LogIn className="w-4 h-4 mr-2" />
             {loading ? "Cargando..." : isLogin ? "Iniciar Sesión" : "Registrarse"}
           </Button>

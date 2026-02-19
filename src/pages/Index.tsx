@@ -37,9 +37,9 @@ const quickServices = [
 ];
 
 const novedades = [
-  { title: "Nuevo Kingo EV", desc: "Conoce la versión 100% eléctrica de King Long.", tag: "Novedad" },
-  { title: "Promoción en Refacciones", desc: "20% de descuento en filtros y aceites este mes.", tag: "Oferta" },
-  { title: "Mantenimiento Preventivo", desc: "Agenda tu servicio con costo preferencial.", tag: "Oferta" },
+  { title: "Nuevo Kingo EV", desc: "Conoce la versión 100% eléctrica de King Long.", tag: "Novedad", type: "ventas" },
+  { title: "Promoción en Refacciones", desc: "20% de descuento en filtros y aceites este mes.", tag: "Oferta", type: "mantenimiento" },
+  { title: "Mantenimiento Preventivo", desc: "Agenda tu servicio con costo preferencial.", tag: "Oferta", type: "mantenimiento" },
 ];
 
 const Index = () => {
@@ -71,8 +71,12 @@ const Index = () => {
     }
   };
 
-  const handleNovedadClick = () => {
-    window.open("https://wa.me/528712196410?text=Hola, me interesa conocer más sobre las novedades King Long", "_blank");
+  const handleNovedadClick = (n: typeof novedades[0]) => {
+    if (n.type === "mantenimiento") {
+      window.open("https://wa.me/528711377115?text=Hola, me interesa agendar un servicio de mantenimiento para mi King Long", "_blank");
+    } else {
+      window.open("https://wa.me/528712196410?text=Hola, me interesa conocer más sobre las novedades King Long", "_blank");
+    }
   };
 
   return (
@@ -135,7 +139,7 @@ const Index = () => {
         </h2>
         <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
           {novedades.map((n, i) => (
-            <button key={i} onClick={handleNovedadClick} className="min-w-[240px] p-4 rounded-xl border border-border bg-card space-y-1 text-left active:scale-[0.98] transition-transform">
+            <button key={i} onClick={() => handleNovedadClick(n)} className="min-w-[240px] p-4 rounded-xl border border-border bg-card space-y-1 text-left active:scale-[0.98] transition-transform">
               <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${n.tag === "Novedad" ? "bg-primary/10 text-primary" : "bg-accent/10 text-accent"}`}>
                 {n.tag}
               </span>

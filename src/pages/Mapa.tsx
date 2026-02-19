@@ -11,7 +11,7 @@ const Mapa = () => {
 
       <div className="w-full rounded-xl overflow-hidden border border-border shadow-[var(--shadow-card)]">
         <iframe
-          src="https://www.google.com/maps/d/embed?mid=1Pgc_MidkEYJh-LKA_BAbzgJvm9xjPQI&ehbc=2E312F"
+          src="https://www.google.com/maps/d/embed?mid=1JP_95sv_6ikE5aB2SwmxwjSKdf-zB8w&ehbc=2E312F"
           width="100%"
           height="450"
           style={{ border: 0 }}
