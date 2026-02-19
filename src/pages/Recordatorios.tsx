@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bell, Plus, Check, Calendar, Car, Download } from "lucide-react";
+import { Bell, Plus, Check, Calendar, Car, Download, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 const generateICS = (r: { title: string; description: string | null; due_date: string }) => {
@@ -88,6 +88,13 @@ const Recordatorios = () => {
     fetchReminders();
   };
 
+  const deleteReminder = async (id: string) => {
+    const { error } = await supabase.from("maintenance_reminders").delete().eq("id", id);
+    if (error) { toast.error("Error al eliminar"); return; }
+    toast.success("Recordatorio eliminado");
+    fetchReminders();
+  };
+
   const isOverdue = (date: string) => new Date(date) < new Date();
 
   return (
@@ -101,13 +108,6 @@ const Recordatorios = () => {
           <Button size="sm" onClick={() => setShowForm(!showForm)} className="bg-gradient-gold text-white">
             <Plus className="w-4 h-4" />
           </Button>
-        </div>
-
-        <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 flex items-start gap-2">
-          <Download className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Toca el icono <strong className="text-primary">↓</strong> en cada recordatorio para guardarlo en el calendario de tu celular.
-          </p>
         </div>
 
         {vehicles.length === 0 && (
@@ -141,32 +141,58 @@ const Recordatorios = () => {
           </form>
         )}
 
-        <div className="space-y-2">
-          {reminders.map((r) => (
-            <div key={r.id} className={`glass-card rounded-xl p-4 flex items-start gap-3 ${r.completed ? "opacity-50" : ""}`}>
-              <button onClick={() => toggleComplete(r.id, r.completed)}
-                className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                  r.completed ? "bg-primary border-primary" : "border-muted-foreground"
-                }`}>
-                {r.completed && <Check className="w-3 h-3 text-white" />}
-              </button>
-              <div className="flex-1 min-w-0">
-                <p className={`font-semibold text-sm ${r.completed ? "line-through" : "text-foreground"}`}>{r.title}</p>
-                {r.description && <p className="text-xs text-muted-foreground">{r.description}</p>}
-                <div className="flex gap-3 mt-1 text-xs">
-                  <span className={`flex items-center gap-1 ${!r.completed && isOverdue(r.due_date) ? "text-destructive" : "text-muted-foreground"}`}>
-                    <Calendar className="w-3 h-3" />
-                    {new Date(r.due_date).toLocaleDateString("es-MX")}
-                  </span>
-                  {r.due_km && <span className="text-muted-foreground">{r.due_km.toLocaleString()} km</span>}
-                </div>
-              </div>
-              <button onClick={() => generateICS(r)} className="text-muted-foreground hover:text-primary shrink-0" title="Agregar al calendario">
-                <Download className="w-4 h-4" />
-              </button>
+        {reminders.length === 0 && vehicles.length > 0 && !showForm && (
+          <div className="glass-card rounded-xl p-6 text-center space-y-3">
+            <Bell className="w-10 h-10 mx-auto text-primary/40" />
+            <p className="text-muted-foreground text-sm">No tienes recordatorios aún.</p>
+            <Button size="sm" onClick={() => setShowForm(true)} className="bg-gradient-gold text-white">
+              <Plus className="w-4 h-4 mr-1" /> Crear mi primer recordatorio
+            </Button>
+          </div>
+        )}
+
+        {reminders.length > 0 && (
+          <>
+            <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 flex items-start gap-2">
+              <Download className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Toca el icono de descarga en cada recordatorio para guardarlo en el calendario de tu celular.
+              </p>
             </div>
-          ))}
-        </div>
+
+            <div className="space-y-2">
+              {reminders.map((r) => (
+                <div key={r.id} className={`glass-card rounded-xl p-4 flex items-start gap-3 ${r.completed ? "opacity-50" : ""}`}>
+                  <button onClick={() => toggleComplete(r.id, r.completed)}
+                    className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                      r.completed ? "bg-primary border-primary" : "border-muted-foreground"
+                    }`}>
+                    {r.completed && <Check className="w-3 h-3 text-white" />}
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <p className={`font-semibold text-sm ${r.completed ? "line-through" : "text-foreground"}`}>{r.title}</p>
+                    {r.description && <p className="text-xs text-muted-foreground">{r.description}</p>}
+                    <div className="flex gap-3 mt-1 text-xs">
+                      <span className={`flex items-center gap-1 ${!r.completed && isOverdue(r.due_date) ? "text-destructive" : "text-muted-foreground"}`}>
+                        <Calendar className="w-3 h-3" />
+                        {new Date(r.due_date).toLocaleDateString("es-MX")}
+                      </span>
+                      {r.due_km && <span className="text-muted-foreground">{r.due_km.toLocaleString()} km</span>}
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2 shrink-0">
+                    <button onClick={() => generateICS(r)} className="text-muted-foreground hover:text-primary" title="Agregar al calendario">
+                      <Download className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => deleteReminder(r.id)} className="text-muted-foreground hover:text-destructive" title="Eliminar recordatorio">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

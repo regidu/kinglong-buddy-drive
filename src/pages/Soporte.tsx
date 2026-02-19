@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Send, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
+import logo from "@/assets/logo-kinglong.png";
 
 interface Message {
   id: string;
@@ -14,12 +15,25 @@ interface Message {
   created_at: string;
 }
 
+const TypingIndicator = () => (
+  <div className="flex justify-start">
+    <div className="glass-card rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-1">
+      <span className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:0ms]" />
+      <span className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:150ms]" />
+      <span className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:300ms]" />
+    </div>
+  </div>
+);
+
 const Soporte = () => {
   const { user } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [typing, setTyping] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const avatar = user?.user_metadata?.avatar || null;
+  const avatarBg = user?.user_metadata?.avatar_bg || "bg-red-100";
 
   useEffect(() => {
     if (!user) return;
@@ -31,6 +45,7 @@ const Soporte = () => {
         const msg = payload.new as Message;
         if (msg.user_id === user.id) {
           setMessages((prev) => [...prev, msg]);
+          setTyping(false);
         }
       })
       .subscribe();
@@ -40,14 +55,26 @@ const Soporte = () => {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, typing]);
 
   const fetchMessages = async () => {
     const { data } = await supabase
       .from("support_messages")
       .select("*")
       .order("created_at", { ascending: true });
-    if (data) setMessages(data as Message[]);
+    if (data) {
+      if (data.length === 0) {
+        // Insert Killy welcome
+        const { data: welcome } = await supabase.from("support_messages").insert({
+          user_id: user!.id,
+          message: "¡Hola! 👋 Soy Killy, tu asistente King Long. Estoy aquí para ayudarte con cualquier duda o situación. ¿En qué puedo servirte hoy?",
+          is_from_user: false,
+        }).select().single();
+        if (welcome) setMessages([welcome as Message]);
+      } else {
+        setMessages(data as Message[]);
+      }
+    }
   };
 
   const sendMessage = async (e: React.FormEvent) => {
@@ -65,7 +92,7 @@ const Soporte = () => {
       toast.error("Error al enviar mensaje");
     } else {
       setNewMessage("");
-      // Auto-reply simulation
+      setTyping(true);
       setTimeout(async () => {
         await supabase.from("support_messages").insert({
           user_id: user.id,
@@ -84,7 +111,7 @@ const Soporte = () => {
           <MessageCircle className="w-5 h-5 text-primary" />
           Soporte King Long
         </h1>
-        <p className="text-xs text-muted-foreground">Chat con nuestro equipo</p>
+        <p className="text-xs text-muted-foreground">Chat con Killy, tu asistente</p>
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
@@ -96,8 +123,11 @@ const Soporte = () => {
         )}
 
         {messages.map((msg) => (
-          <div key={msg.id} className={`flex ${msg.is_from_user ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[80%] rounded-2xl px-4 py-2 text-sm ${
+          <div key={msg.id} className={`flex items-end gap-2 ${msg.is_from_user ? "justify-end" : "justify-start"}`}>
+            {!msg.is_from_user && (
+              <img src={logo} alt="Killy" className="w-7 h-7 rounded-full object-contain bg-card border border-border shrink-0" />
+            )}
+            <div className={`max-w-[75%] rounded-2xl px-4 py-2 text-sm ${
               msg.is_from_user
                 ? "bg-gradient-gold text-white rounded-br-md"
                 : "glass-card text-foreground rounded-bl-md"
@@ -107,8 +137,18 @@ const Soporte = () => {
                 {new Date(msg.created_at).toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}
               </p>
             </div>
+            {msg.is_from_user && (
+              avatar ? (
+                <div className={`w-7 h-7 rounded-full ${avatarBg} flex items-center justify-center text-sm shrink-0`}>{avatar}</div>
+              ) : (
+                <div className="w-7 h-7 rounded-full bg-muted flex items-center justify-center shrink-0">
+                  <span className="text-xs text-muted-foreground">Tú</span>
+                </div>
+              )
+            )}
           </div>
         ))}
+        {typing && <TypingIndicator />}
         <div ref={bottomRef} />
       </div>
 

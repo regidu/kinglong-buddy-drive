@@ -1,6 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
 import { Home, Phone, Car, MessageCircle, Bell } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
   { icon: Home, label: "Inicio", path: "/" },
@@ -12,16 +11,12 @@ const navItems = [
 
 const BottomNav = () => {
   const location = useLocation();
-  const { user } = useAuth();
-  const avatar = user?.user_metadata?.avatar || null;
-  const avatarBg = user?.user_metadata?.avatar_bg || "bg-red-100";
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 glass-card border-t border-border pb-safe">
       <div className="flex items-center justify-around py-2 px-2 max-w-lg mx-auto">
         {navItems.map(({ icon: Icon, label, path }) => {
           const active = location.pathname === path;
-          const isHome = path === "/";
           return (
             <Link
               key={path}
@@ -32,11 +27,7 @@ const BottomNav = () => {
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              {isHome && avatar ? (
-                <div className={`w-5 h-5 rounded-full ${avatarBg} flex items-center justify-center text-xs`}>{avatar}</div>
-              ) : (
-                <Icon className={`w-5 h-5 ${active ? "drop-shadow-[0_0_6px_hsl(0,73%,42%)]" : ""}`} />
-              )}
+              <Icon className={`w-5 h-5 ${active ? "drop-shadow-[0_0_6px_hsl(0,73%,42%)]" : ""}`} />
               <span className="text-[10px] font-medium">{label}</span>
             </Link>
           );

@@ -10,19 +10,11 @@ const Manual = () => (
     <a
       href="/manual-kingo-2025.pdf"
       download
-      className="flex items-center justify-center gap-3 py-3 rounded-xl border-2 border-primary text-primary font-semibold active:scale-[0.98] transition-transform mb-4"
+      className="flex items-center justify-center gap-3 py-3 rounded-xl border-2 border-primary text-primary font-semibold active:scale-[0.98] transition-transform"
     >
       <Download className="w-5 h-5" />
       Descargar PDF
     </a>
-
-    <div className="rounded-xl overflow-hidden border border-border shadow-[var(--shadow-card)]">
-      <iframe
-        src="/manual-kingo-2025.pdf"
-        className="w-full h-[70vh]"
-        title="Manual Kingo 2025"
-      />
-    </div>
   </div>
 );
 
