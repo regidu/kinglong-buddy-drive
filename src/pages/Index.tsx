@@ -157,13 +157,6 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Add photo button */}
-      <div className="px-4 mt-2">
-        <button onClick={() => fileInputRef.current?.click()} className="text-xs text-primary underline">
-          + Agregar foto al carrusel
-        </button>
-        <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAddImage} />
-      </div>
 
       {/* Emergency Button */}
       <div className="px-4 mt-2 relative z-10">
@@ -212,10 +205,13 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Terms footer */}
-      <div className="px-4 mt-8 mb-4 text-center">
+      {/* Terms & Privacy footer */}
+      <div className="px-4 mt-8 mb-4 text-center flex justify-center gap-4">
         <Link to="/terminos" className="text-xs text-muted-foreground hover:text-primary underline">
           Términos y Condiciones
+        </Link>
+        <Link to="/terminos?tab=privacidad" className="text-xs text-muted-foreground hover:text-primary underline">
+          Aviso de Privacidad
         </Link>
       </div>
     </div>

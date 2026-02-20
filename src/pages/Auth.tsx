@@ -24,6 +24,7 @@ const Auth = () => {
   const [phone, setPhone] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [acceptPrivacy, setAcceptPrivacy] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -40,8 +41,8 @@ const Auth = () => {
       toast.error("Las contraseñas no coinciden");
       return;
     }
-    if (!isLogin && !acceptTerms) {
-      toast.error("Debes aceptar los términos y condiciones");
+    if (!isLogin && (!acceptTerms || !acceptPrivacy)) {
+      toast.error("Debes aceptar los términos y el aviso de privacidad");
       return;
     }
     setLoading(true);
@@ -90,56 +91,24 @@ const Auth = () => {
             <>
               <div className="relative">
                 <User className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="Nombre completo"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="pl-10"
-                  required
-                />
+                <Input placeholder="Nombre completo" value={fullName} onChange={(e) => setFullName(e.target.value)} className="pl-10" required />
               </div>
               <div className="relative">
                 <Phone className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                <Input
-                  type="tel"
-                  placeholder="Teléfono de contacto"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="pl-10"
-                  required
-                />
+                <Input type="tel" placeholder="Teléfono de contacto" value={phone} onChange={(e) => setPhone(e.target.value)} className="pl-10" required />
               </div>
             </>
           )}
 
           <div className="relative">
             <Mail className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-            <Input
-              type="email"
-              placeholder="Correo electrónico"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="pl-10"
-              required
-            />
+            <Input type="email" placeholder="Correo electrónico" value={email} onChange={(e) => setEmail(e.target.value)} className="pl-10" required />
           </div>
 
           <div className="relative">
             <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-            <Input
-              type={showPassword ? "text" : "password"}
-              placeholder="Contraseña"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 pr-10"
-              required
-              minLength={8}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-3 text-muted-foreground hover:text-foreground"
-            >
+            <Input type={showPassword ? "text" : "password"} placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} className="pl-10 pr-10" required minLength={8} />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground">
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
@@ -147,15 +116,7 @@ const Auth = () => {
           {!isLogin && (
             <div className="relative">
               <Lock className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-              <Input
-                type={showPassword ? "text" : "password"}
-                placeholder="Confirmar contraseña"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="pl-10"
-                required
-                minLength={8}
-              />
+              <Input type={showPassword ? "text" : "password"} placeholder="Confirmar contraseña" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="pl-10 pr-10" required minLength={8} />
               {confirmPassword.length > 0 && (
                 <span className="absolute right-3 top-3">
                   {passwordsMatch ? <Check className="w-4 h-4 text-green-500" /> : <X className="w-4 h-4 text-destructive" />}
@@ -179,23 +140,25 @@ const Auth = () => {
           )}
 
           {!isLogin && (
-            <label className="flex items-start gap-2 text-sm text-muted-foreground cursor-pointer">
-              <input
-                type="checkbox"
-                checked={acceptTerms}
-                onChange={(e) => setAcceptTerms(e.target.checked)}
-                className="mt-0.5 accent-primary"
-              />
-              <span>
-                Acepto los{" "}
-                <Link to="/terminos" className="text-primary underline">
-                  Términos y Condiciones
-                </Link>
-              </span>
-            </label>
+            <div className="space-y-2">
+              <label className="flex items-start gap-2 text-sm text-muted-foreground cursor-pointer">
+                <input type="checkbox" checked={acceptTerms} onChange={(e) => setAcceptTerms(e.target.checked)} className="mt-0.5 accent-primary" />
+                <span>
+                  Acepto los{" "}
+                  <Link to="/terminos" className="text-primary underline">Términos y Condiciones</Link>
+                </span>
+              </label>
+              <label className="flex items-start gap-2 text-sm text-muted-foreground cursor-pointer">
+                <input type="checkbox" checked={acceptPrivacy} onChange={(e) => setAcceptPrivacy(e.target.checked)} className="mt-0.5 accent-primary" />
+                <span>
+                  Acepto el{" "}
+                  <Link to="/terminos?tab=privacidad" className="text-primary underline">Aviso de Privacidad</Link>
+                </span>
+              </label>
+            </div>
           )}
 
-          <Button type="submit" className="w-full bg-gradient-gold text-white font-semibold" disabled={loading || (!isLogin && (!allRulesPass || !acceptTerms || !passwordsMatch))}>
+          <Button type="submit" className="w-full bg-gradient-gold text-white font-semibold" disabled={loading || (!isLogin && (!allRulesPass || !acceptTerms || !acceptPrivacy || !passwordsMatch))}>
             <LogIn className="w-4 h-4 mr-2" />
             {loading ? "Cargando..." : isLogin ? "Iniciar Sesión" : "Registrarse"}
           </Button>
@@ -203,17 +166,12 @@ const Auth = () => {
 
         {isLogin && (
           <div className="text-center">
-            <Link to="/forgot-password" className="text-sm text-primary hover:underline">
-              ¿Olvidaste tu contraseña?
-            </Link>
+            <Link to="/forgot-password" className="text-sm text-primary hover:underline">¿Olvidaste tu contraseña?</Link>
           </div>
         )}
 
         <div className="text-center">
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-sm text-primary hover:underline"
-          >
+          <button onClick={() => setIsLogin(!isLogin)} className="text-sm text-primary hover:underline">
             {isLogin ? "¿No tienes cuenta? Regístrate" : "¿Ya tienes cuenta? Inicia sesión"}
           </button>
         </div>
