@@ -132,7 +132,7 @@ const Recordatorios = () => {
             </select>
             <Input placeholder="Título (ej: Cambio de aceite)" value={title} onChange={(e) => setTitle(e.target.value)} required />
             <Input placeholder="Descripción (opcional)" value={description} onChange={(e) => setDescription(e.target.value)} />
-            <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} required />
+            <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} required min={new Date().toISOString().split("T")[0]} />
             <Input placeholder="Km programado (opcional)" type="number" value={dueKm} onChange={(e) => setDueKm(e.target.value)} />
             <div className="flex gap-2">
               <Button type="submit" className="flex-1 bg-gradient-gold text-white">Crear</Button>
