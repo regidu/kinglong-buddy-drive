@@ -36,7 +36,6 @@ const KingoRunner = () => {
     roadOffset: 0,
     gameState: "idle" as string,
     buildingOffset: 0,
-    shake: 0,
   });
 
   const rafRef = useRef<number>(0);
@@ -72,7 +71,6 @@ const KingoRunner = () => {
     }
   }, []);
 
-  // Keyboard
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.code === "ArrowLeft" || e.code === "KeyA") { e.preventDefault(); moveLane(-1); }
@@ -83,7 +81,6 @@ const KingoRunner = () => {
     return () => window.removeEventListener("keydown", handleKey);
   }, [moveLane, startGame]);
 
-  // Touch swipe
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartRef.current = e.touches[0].clientX;
     if (stateRef.current.gameState !== "playing") startGame();
@@ -91,22 +88,15 @@ const KingoRunner = () => {
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartRef.current === null) return;
     const dx = e.changedTouches[0].clientX - touchStartRef.current;
-    if (Math.abs(dx) > 30) {
-      moveLane(dx > 0 ? 1 : -1);
-    }
+    if (Math.abs(dx) > 30) moveLane(dx > 0 ? 1 : -1);
     touchStartRef.current = null;
   };
 
-  // Draw helpers
   const drawTruck = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
-    const s = stateRef.current;
-    const shakeX = s.gameState === "playing" ? (Math.random() - 0.5) * 1.5 : 0;
-    const sx = x + shakeX;
-
-    // Body
+    // Body - stable, no shake
     ctx.fillStyle = "#f5f5f5";
     ctx.beginPath();
-    ctx.roundRect(sx + 5, y + 5, TRUCK_SIZE - 10, TRUCK_SIZE - 10, 6);
+    ctx.roundRect(x + 5, y + 5, TRUCK_SIZE - 10, TRUCK_SIZE - 10, 6);
     ctx.fill();
     ctx.strokeStyle = "#c8a961";
     ctx.lineWidth = 2;
@@ -115,28 +105,28 @@ const KingoRunner = () => {
     // Windshield
     ctx.fillStyle = "#87CEEB";
     ctx.beginPath();
-    ctx.roundRect(sx + 12, y + 8, TRUCK_SIZE - 24, 14, 3);
+    ctx.roundRect(x + 12, y + 8, TRUCK_SIZE - 24, 14, 3);
     ctx.fill();
 
     // Headlights
     ctx.fillStyle = "#FFD700";
-    ctx.fillRect(sx + 8, y + 8, 4, 4);
-    ctx.fillRect(sx + TRUCK_SIZE - 12, y + 8, 4, 4);
+    ctx.fillRect(x + 8, y + 8, 4, 4);
+    ctx.fillRect(x + TRUCK_SIZE - 12, y + 8, 4, 4);
 
     // Side lines
     ctx.strokeStyle = "#c8a961";
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(sx + 8, y + 25); ctx.lineTo(sx + 8, y + 40);
-    ctx.moveTo(sx + TRUCK_SIZE - 8, y + 25); ctx.lineTo(sx + TRUCK_SIZE - 8, y + 40);
+    ctx.moveTo(x + 8, y + 25); ctx.lineTo(x + 8, y + 40);
+    ctx.moveTo(x + TRUCK_SIZE - 8, y + 25); ctx.lineTo(x + TRUCK_SIZE - 8, y + 40);
     ctx.stroke();
 
     // Wheels
     ctx.fillStyle = "#333";
-    ctx.fillRect(sx + 3, y + 12, 5, 10);
-    ctx.fillRect(sx + TRUCK_SIZE - 8, y + 12, 5, 10);
-    ctx.fillRect(sx + 3, y + 32, 5, 10);
-    ctx.fillRect(sx + TRUCK_SIZE - 8, y + 32, 5, 10);
+    ctx.fillRect(x + 3, y + 12, 5, 10);
+    ctx.fillRect(x + TRUCK_SIZE - 8, y + 12, 5, 10);
+    ctx.fillRect(x + 3, y + 32, 5, 10);
+    ctx.fillRect(x + TRUCK_SIZE - 8, y + 32, 5, 10);
   };
 
   const drawObstacle = (ctx: CanvasRenderingContext2D, x: number, y: number, type: ObstacleType) => {
@@ -190,11 +180,9 @@ const KingoRunner = () => {
       const s = stateRef.current;
       ctx.clearRect(0, 0, GAME_W, GAME_H);
 
-      // Background - sidewalks / buildings
-      // Left sidewalk
+      // Sidewalks
       ctx.fillStyle = "#d4c5a9";
       ctx.fillRect(0, 0, 15, GAME_H);
-      // Right sidewalk
       ctx.fillRect(GAME_W - 15, 0, 15, GAME_H);
 
       // Road
@@ -216,17 +204,15 @@ const KingoRunner = () => {
       }
       ctx.setLineDash([]);
 
-      // Scrolling buildings/neon on sidewalks
+      // Buildings/neon
       s.buildingOffset = (s.buildingOffset + s.speed * 0.5) % 120;
       const colors = ["#e74c3c", "#f39c12", "#e91e63", "#9b59b6", "#3498db", "#1abc9c"];
       for (let yy = -s.buildingOffset; yy < GAME_H + 120; yy += 60) {
         const ci = Math.abs(Math.floor(yy / 60)) % colors.length;
-        // Left neon signs
         ctx.fillStyle = colors[ci] + "88";
         ctx.fillRect(1, yy, 12, 8);
         ctx.fillStyle = colors[(ci + 3) % colors.length] + "88";
         ctx.fillRect(GAME_W - 13, yy + 25, 12, 8);
-        // Small dots
         ctx.fillStyle = "#fbbf2488";
         ctx.fillRect(3, yy + 15, 3, 3);
         ctx.fillRect(GAME_W - 8, yy + 40, 3, 3);
@@ -236,11 +222,9 @@ const KingoRunner = () => {
         s.frame++;
         s.speed = BASE_SPEED + Math.floor(s.score / 5) * 0.5;
 
-        // Smooth lane movement
         const targetX = 15 + ((GAME_W - 30) / LANE_COUNT) * s.targetLane + ((GAME_W - 30) / LANE_COUNT - TRUCK_SIZE) / 2;
-        s.truckX += (targetX - s.truckX) * 0.2;
+        s.truckX += (targetX - s.truckX) * 0.25;
 
-        // Spawn
         const spawnRate = Math.max(25, SPAWN_INTERVAL_BASE - s.score * 1.5);
         if (s.frame % Math.floor(spawnRate) === 0) {
           const lane = Math.floor(Math.random() * LANE_COUNT);
@@ -248,7 +232,6 @@ const KingoRunner = () => {
           s.obstacles.push({ lane, y: -OBS_SIZE, type, scored: false });
         }
 
-        // Move & check
         for (let i = s.obstacles.length - 1; i >= 0; i--) {
           const ob = s.obstacles[i];
           ob.y += s.speed;
@@ -258,7 +241,6 @@ const KingoRunner = () => {
             s.score++;
             setScore(s.score);
           }
-          // Collision
           const obX = 15 + ((GAME_W - 30) / LANE_COUNT) * ob.lane + ((GAME_W - 30) / LANE_COUNT - OBS_SIZE) / 2;
           const truckTop = GAME_H - TRUCK_SIZE - 20;
           if (
@@ -283,10 +265,9 @@ const KingoRunner = () => {
       }
 
       // Draw truck
-      const truckY = GAME_H - TRUCK_SIZE - 20;
-      drawTruck(ctx, s.truckX, truckY);
+      drawTruck(ctx, s.truckX, GAME_H - TRUCK_SIZE - 20);
 
-      // Score display
+      // Score
       ctx.fillStyle = "#fff";
       ctx.font = "bold 14px sans-serif";
       ctx.textAlign = "right";
@@ -301,7 +282,8 @@ const KingoRunner = () => {
 
   return (
     <div className="min-h-screen pb-24 px-4 pt-6 flex flex-col items-center">
-      <h1 className="text-2xl font-bold text-gradient-gold mb-4">🚐 Kingo Runner</h1>
+      <h1 className="text-2xl font-bold text-gradient-gold mb-1">🚐 Kingo Runner</h1>
+      <p className="text-xs text-muted-foreground mb-3">Récord: {highScore} ⭐</p>
 
       <div
         className="relative w-full max-w-[240px]"
