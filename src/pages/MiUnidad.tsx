@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Car, Plus, Trash2, Phone } from "lucide-react";
+import { Car, Plus, Trash2, Phone, Camera } from "lucide-react";
 import { toast } from "sonner";
+import LoadingScreen from "@/components/LoadingScreen";
 
 interface Vehicle {
   id: string;
@@ -28,6 +29,12 @@ const MiUnidad = () => {
   const [year, setYear] = useState("");
   const [nickname, setNickname] = useState("");
   const [loading, setLoading] = useState(true);
+  const [vehiclePhotos, setVehiclePhotos] = useState<Record<string, string>>(() => {
+    const saved = localStorage.getItem("vehicle_photos");
+    return saved ? JSON.parse(saved) : {};
+  });
+  const photoInputRef = useRef<HTMLInputElement>(null);
+  const [photoTargetVin, setPhotoTargetVin] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) fetchVehicles();
@@ -74,7 +81,22 @@ const MiUnidad = () => {
     }
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Cargando...</div>;
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !photoTargetVin) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const updated = { ...vehiclePhotos, [photoTargetVin]: reader.result as string };
+      setVehiclePhotos(updated);
+      localStorage.setItem("vehicle_photos", JSON.stringify(updated));
+      toast.success("Foto actualizada");
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+    setPhotoTargetVin(null);
+  };
+
+  if (loading) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen pb-24 pt-safe">
@@ -120,6 +142,7 @@ const MiUnidad = () => {
               ))}
             </select>
             <Input placeholder="Apodo (ej: Mi Reina)" value={nickname} onChange={(e) => setNickname(e.target.value)} />
+            <p className="text-xs text-muted-foreground">📷 Podrás agregar una foto después de registrar</p>
             <div className="flex gap-2">
               <Button type="submit" className="flex-1 bg-gradient-gold text-white">Registrar</Button>
               <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Cancelar</Button>
@@ -127,13 +150,23 @@ const MiUnidad = () => {
           </form>
         )}
 
+        <input type="file" accept="image/*" ref={photoInputRef} className="hidden" onChange={handlePhotoUpload} />
+
         {vehicles.map((v) => (
           <div key={v.id} className="glass-card rounded-xl p-4 space-y-2">
+            {vehiclePhotos[v.vin] && (
+              <img src={vehiclePhotos[v.vin]} alt="Mi unidad" className="w-full h-32 object-cover rounded-lg" />
+            )}
             <div className="flex items-center justify-between">
               <h3 className="font-bold text-foreground">{v.nickname || v.model || "Mi Unidad"}</h3>
-              <button onClick={() => deleteVehicle(v.id)} className="text-muted-foreground hover:text-destructive">
-                <Trash2 className="w-4 h-4" />
-              </button>
+              <div className="flex gap-2">
+                <button onClick={() => { setPhotoTargetVin(v.vin); photoInputRef.current?.click(); }} className="text-muted-foreground hover:text-primary">
+                  <Camera className="w-4 h-4" />
+                </button>
+                <button onClick={() => deleteVehicle(v.id)} className="text-muted-foreground hover:text-destructive">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
             <p className="text-xs text-muted-foreground font-mono">VIN: {v.vin}</p>
             {v.model && <p className="text-sm text-foreground/80">Modelo: {v.model}</p>}
