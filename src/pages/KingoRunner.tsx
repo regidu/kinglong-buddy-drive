@@ -9,7 +9,7 @@ const OBS_SIZE = 40;
 const BASE_SPEED = 3;
 const SPAWN_INTERVAL_BASE = 60;
 
-type ObstacleType = "cone" | "car_red" | "car_blue" | "barrel";
+type ObstacleType = "cone" | "car_red" | "car_blue" | "barrel" | "lantern";
 interface Obstacle {
   lane: number;
   y: number;
@@ -17,7 +17,7 @@ interface Obstacle {
   scored: boolean;
 }
 
-const obstacleTypes: ObstacleType[] = ["cone", "car_red", "car_blue", "barrel"];
+const obstacleTypes: ObstacleType[] = ["cone", "car_red", "car_blue", "barrel", "lantern"];
 
 const KingoRunner = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -93,7 +93,6 @@ const KingoRunner = () => {
   };
 
   const drawTruck = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
-    // Body - stable, no shake
     ctx.fillStyle = "#f5f5f5";
     ctx.beginPath();
     ctx.roundRect(x + 5, y + 5, TRUCK_SIZE - 10, TRUCK_SIZE - 10, 6);
@@ -101,27 +100,19 @@ const KingoRunner = () => {
     ctx.strokeStyle = "#c8a961";
     ctx.lineWidth = 2;
     ctx.stroke();
-
-    // Windshield
     ctx.fillStyle = "#87CEEB";
     ctx.beginPath();
     ctx.roundRect(x + 12, y + 8, TRUCK_SIZE - 24, 14, 3);
     ctx.fill();
-
-    // Headlights
     ctx.fillStyle = "#FFD700";
     ctx.fillRect(x + 8, y + 8, 4, 4);
     ctx.fillRect(x + TRUCK_SIZE - 12, y + 8, 4, 4);
-
-    // Side lines
     ctx.strokeStyle = "#c8a961";
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(x + 8, y + 25); ctx.lineTo(x + 8, y + 40);
     ctx.moveTo(x + TRUCK_SIZE - 8, y + 25); ctx.lineTo(x + TRUCK_SIZE - 8, y + 40);
     ctx.stroke();
-
-    // Wheels
     ctx.fillStyle = "#333";
     ctx.fillRect(x + 3, y + 12, 5, 10);
     ctx.fillRect(x + TRUCK_SIZE - 8, y + 12, 5, 10);
@@ -167,10 +158,32 @@ const KingoRunner = () => {
         ctx.fillStyle = "#fbbf24";
         ctx.fillRect(cx - 4, y + OBS_SIZE / 2 - 6, 8, 12);
         break;
+      case "lantern":
+        // Chinese lantern
+        ctx.fillStyle = "#dc2626";
+        ctx.beginPath();
+        ctx.ellipse(cx, y + OBS_SIZE / 2, OBS_SIZE / 2 - 6, OBS_SIZE / 2 - 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = "#fbbf24"; ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(cx - 8, y + OBS_SIZE * 0.3); ctx.lineTo(cx + 8, y + OBS_SIZE * 0.3);
+        ctx.moveTo(cx - 10, y + OBS_SIZE * 0.5); ctx.lineTo(cx + 10, y + OBS_SIZE * 0.5);
+        ctx.moveTo(cx - 8, y + OBS_SIZE * 0.7); ctx.lineTo(cx + 8, y + OBS_SIZE * 0.7);
+        ctx.stroke();
+        // Top knob
+        ctx.fillStyle = "#fbbf24";
+        ctx.fillRect(cx - 3, y, 6, 6);
+        // Tassel
+        ctx.strokeStyle = "#fbbf24"; ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(cx - 2, y + OBS_SIZE - 2); ctx.lineTo(cx - 4, y + OBS_SIZE + 4);
+        ctx.moveTo(cx, y + OBS_SIZE - 2); ctx.lineTo(cx, y + OBS_SIZE + 5);
+        ctx.moveTo(cx + 2, y + OBS_SIZE - 2); ctx.lineTo(cx + 4, y + OBS_SIZE + 4);
+        ctx.stroke();
+        break;
     }
   };
 
-  // Game loop
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -180,16 +193,13 @@ const KingoRunner = () => {
       const s = stateRef.current;
       ctx.clearRect(0, 0, GAME_W, GAME_H);
 
-      // Sidewalks
       ctx.fillStyle = "#d4c5a9";
       ctx.fillRect(0, 0, 15, GAME_H);
       ctx.fillRect(GAME_W - 15, 0, 15, GAME_H);
 
-      // Road
       ctx.fillStyle = "#3a3a3a";
       ctx.fillRect(15, 0, GAME_W - 30, GAME_H);
 
-      // Lane dividers
       s.roadOffset = (s.roadOffset + s.speed) % 30;
       ctx.strokeStyle = "#ffffff55";
       ctx.lineWidth = 2;
@@ -197,14 +207,10 @@ const KingoRunner = () => {
       for (let i = 1; i < LANE_COUNT; i++) {
         const lx = 15 + ((GAME_W - 30) / LANE_COUNT) * i;
         ctx.lineDashOffset = -s.roadOffset;
-        ctx.beginPath();
-        ctx.moveTo(lx, 0);
-        ctx.lineTo(lx, GAME_H);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(lx, 0); ctx.lineTo(lx, GAME_H); ctx.stroke();
       }
       ctx.setLineDash([]);
 
-      // Buildings/neon
       s.buildingOffset = (s.buildingOffset + s.speed * 0.5) % 120;
       const colors = ["#e74c3c", "#f39c12", "#e91e63", "#9b59b6", "#3498db", "#1abc9c"];
       for (let yy = -s.buildingOffset; yy < GAME_H + 120; yy += 60) {
@@ -223,7 +229,7 @@ const KingoRunner = () => {
         s.speed = BASE_SPEED + Math.floor(s.score / 5) * 0.5;
 
         const targetX = 15 + ((GAME_W - 30) / LANE_COUNT) * s.targetLane + ((GAME_W - 30) / LANE_COUNT - TRUCK_SIZE) / 2;
-        s.truckX += (targetX - s.truckX) * 0.25;
+        s.truckX += (targetX - s.truckX) * 0.3;
 
         const spawnRate = Math.max(25, SPAWN_INTERVAL_BASE - s.score * 1.5);
         if (s.frame % Math.floor(spawnRate) === 0) {
@@ -258,16 +264,13 @@ const KingoRunner = () => {
         }
       }
 
-      // Draw obstacles
       for (const ob of s.obstacles) {
         const obX = 15 + ((GAME_W - 30) / LANE_COUNT) * ob.lane + ((GAME_W - 30) / LANE_COUNT - OBS_SIZE) / 2;
         drawObstacle(ctx, obX, ob.y, ob.type);
       }
 
-      // Draw truck
       drawTruck(ctx, s.truckX, GAME_H - TRUCK_SIZE - 20);
 
-      // Score
       ctx.fillStyle = "#fff";
       ctx.font = "bold 14px sans-serif";
       ctx.textAlign = "right";
@@ -291,12 +294,7 @@ const KingoRunner = () => {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <canvas
-          ref={canvasRef}
-          width={GAME_W}
-          height={GAME_H}
-          className="w-full rounded-xl border border-border bg-card touch-none"
-        />
+        <canvas ref={canvasRef} width={GAME_W} height={GAME_H} className="w-full rounded-xl border border-border bg-card touch-none" />
 
         {gameState === "idle" && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/70 rounded-xl gap-2">
@@ -320,7 +318,7 @@ const KingoRunner = () => {
         )}
       </div>
 
-      <p className="text-xs text-muted-foreground mt-3 text-center">Desliza para moverte • Esquiva conos, autos y barriles</p>
+      <p className="text-xs text-muted-foreground mt-3 text-center">Desliza para moverte • Esquiva conos, autos, barriles y linternas 🏮</p>
     </div>
   );
 };

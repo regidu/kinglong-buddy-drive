@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Car, Plus, Trash2, Phone, Camera } from "lucide-react";
+import { Car, Plus, Trash2, Phone, Camera, X, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import LoadingScreen from "@/components/LoadingScreen";
 
@@ -19,6 +19,13 @@ interface Vehicle {
 const currentYear = new Date().getFullYear();
 const yearOptions = Array.from({ length: currentYear - 2022 + 1 }, (_, i) => 2022 + i);
 
+const estadosMexico = [
+  "Aguascalientes","Baja California","Baja California Sur","Campeche","Chiapas","Chihuahua","Ciudad de México",
+  "Coahuila","Colima","Durango","Estado de México","Guanajuato","Guerrero","Hidalgo","Jalisco","Michoacán",
+  "Morelos","Nayarit","Nuevo León","Oaxaca","Puebla","Querétaro","Quintana Roo","San Luis Potosí","Sinaloa",
+  "Sonora","Tabasco","Tamaulipas","Tlaxcala","Veracruz","Yucatán","Zacatecas"
+];
+
 const MiUnidad = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -28,24 +35,28 @@ const MiUnidad = () => {
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
   const [nickname, setNickname] = useState("");
+  const [placas, setPlacas] = useState("");
+  const [estadoPlacas, setEstadoPlacas] = useState("");
   const [loading, setLoading] = useState(true);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [confirmDeletePhoto, setConfirmDeletePhoto] = useState<string | null>(null);
+
   const [vehiclePhotos, setVehiclePhotos] = useState<Record<string, string>>(() => {
     const saved = localStorage.getItem("vehicle_photos");
     return saved ? JSON.parse(saved) : {};
   });
+  const [vehiclePlates, setVehiclePlates] = useState<Record<string, { placas: string; estado: string }>>(() => {
+    const saved = localStorage.getItem("vehicle_plates");
+    return saved ? JSON.parse(saved) : {};
+  });
+
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [photoTargetVin, setPhotoTargetVin] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (user) fetchVehicles();
-  }, [user]);
+  useEffect(() => { if (user) fetchVehicles(); }, [user]);
 
   const fetchVehicles = async () => {
-    const { data, error } = await supabase
-      .from("vehicles")
-      .select("*")
-      .order("created_at", { ascending: false });
-
+    const { data, error } = await supabase.from("vehicles").select("*").order("created_at", { ascending: false });
     if (!error && data) setVehicles(data as Vehicle[]);
     setLoading(false);
   };
@@ -53,32 +64,24 @@ const MiUnidad = () => {
   const addVehicle = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-
     const { error } = await supabase.from("vehicles").insert({
-      user_id: user.id,
-      vin: vin.toUpperCase(),
-      model,
-      year: year ? parseInt(year) : null,
-      nickname: nickname || null,
+      user_id: user.id, vin: vin.toUpperCase(), model, year: year ? parseInt(year) : null, nickname: nickname || null,
     });
-
-    if (error) {
-      toast.error("Error al registrar unidad");
-      return;
+    if (error) { toast.error("Error al registrar unidad"); return; }
+    if (placas) {
+      const updated = { ...vehiclePlates, [vin.toUpperCase()]: { placas: placas.toUpperCase(), estado: estadoPlacas } };
+      setVehiclePlates(updated);
+      localStorage.setItem("vehicle_plates", JSON.stringify(updated));
     }
-
     toast.success("¡Unidad registrada exitosamente!");
-    setVin(""); setModel(""); setYear(""); setNickname("");
+    setVin(""); setModel(""); setYear(""); setNickname(""); setPlacas(""); setEstadoPlacas("");
     setShowForm(false);
     fetchVehicles();
   };
 
   const deleteVehicle = async (id: string) => {
     const { error } = await supabase.from("vehicles").delete().eq("id", id);
-    if (!error) {
-      toast.success("Unidad eliminada");
-      fetchVehicles();
-    }
+    if (!error) { toast.success("Unidad eliminada"); setConfirmDeleteId(null); fetchVehicles(); }
   };
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,14 +99,29 @@ const MiUnidad = () => {
     setPhotoTargetVin(null);
   };
 
+  const deletePhoto = (vin: string) => {
+    const updated = { ...vehiclePhotos };
+    delete updated[vin];
+    setVehiclePhotos(updated);
+    localStorage.setItem("vehicle_photos", JSON.stringify(updated));
+    toast.success("Foto eliminada");
+    setConfirmDeletePhoto(null);
+  };
+
+  const savePlates = (vin: string, newPlacas: string, newEstado: string) => {
+    const updated = { ...vehiclePlates, [vin]: { placas: newPlacas.toUpperCase(), estado: newEstado } };
+    setVehiclePlates(updated);
+    localStorage.setItem("vehicle_plates", JSON.stringify(updated));
+    toast.success("Placas guardadas");
+  };
+
   if (loading) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen pb-24 pt-safe">
       <div className="px-4 py-4 space-y-4">
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <Car className="w-6 h-6 text-primary" />
-          Mi Unidad
+          <Car className="w-6 h-6 text-primary" /> Mi Unidad
         </h1>
 
         {vehicles.length === 0 && !showForm && (
@@ -128,20 +146,24 @@ const MiUnidad = () => {
             <p className="text-xs text-muted-foreground -mt-2 ml-1">💡 El VIN se encuentra en la placa metálica del lado del copiloto (parte baja del parabrisas) o en la etiqueta de la puerta del conductor.</p>
             <select value={model} onChange={(e) => setModel(e.target.value)} className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm text-foreground">
               <option value="">Selecciona modelo</option>
-              <option value="Cargo A/A">Cargo A/A</option>
+              <option value="Panel Cerrada">Panel Cerrada</option>
               <option value="Panel Ventanas">Panel Ventanas</option>
               <option value="Panel Ventanas A/A">Panel Ventanas A/A</option>
-              <option value="Equipada 16 Pasajeros">Equipada 16 Pasajeros</option>
+              <option value="16 Pasajeros">16 Pasajeros</option>
               <option value="Kingo EV">Kingo EV</option>
-              <option value="Semi Equipada">Semi Equipada</option>
             </select>
             <select value={year} onChange={(e) => setYear(e.target.value)} className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm text-foreground">
               <option value="">Selecciona año</option>
-              {yearOptions.map((y) => (
-                <option key={y} value={y}>{y}</option>
-              ))}
+              {yearOptions.map((y) => (<option key={y} value={y}>{y}</option>))}
             </select>
             <Input placeholder="Apodo (ej: Mi Reina)" value={nickname} onChange={(e) => setNickname(e.target.value)} />
+            <Input placeholder="Placas (opcional)" value={placas} onChange={(e) => setPlacas(e.target.value)} />
+            {placas && (
+              <select value={estadoPlacas} onChange={(e) => setEstadoPlacas(e.target.value)} className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm text-foreground">
+                <option value="">Estado de las placas</option>
+                {estadosMexico.map((e) => (<option key={e} value={e}>{e}</option>))}
+              </select>
+            )}
             <p className="text-xs text-muted-foreground">📷 Podrás agregar una foto después de registrar</p>
             <div className="flex gap-2">
               <Button type="submit" className="flex-1 bg-gradient-gold text-white">Registrar</Button>
@@ -152,27 +174,21 @@ const MiUnidad = () => {
 
         <input type="file" accept="image/*" ref={photoInputRef} className="hidden" onChange={handlePhotoUpload} />
 
-        {vehicles.map((v) => (
-          <div key={v.id} className="glass-card rounded-xl p-4 space-y-2">
-            {vehiclePhotos[v.vin] && (
-              <img src={vehiclePhotos[v.vin]} alt="Mi unidad" className="w-full h-32 object-cover rounded-lg" />
-            )}
-            <div className="flex items-center justify-between">
-              <h3 className="font-bold text-foreground">{v.nickname || v.model || "Mi Unidad"}</h3>
-              <div className="flex gap-2">
-                <button onClick={() => { setPhotoTargetVin(v.vin); photoInputRef.current?.click(); }} className="text-muted-foreground hover:text-primary">
-                  <Camera className="w-4 h-4" />
-                </button>
-                <button onClick={() => deleteVehicle(v.id)} className="text-muted-foreground hover:text-destructive">
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-            <p className="text-xs text-muted-foreground font-mono">VIN: {v.vin}</p>
-            {v.model && <p className="text-sm text-foreground/80">Modelo: {v.model}</p>}
-            {v.year && <p className="text-sm text-foreground/80">Año: {v.year}</p>}
-          </div>
-        ))}
+        {vehicles.map((v) => {
+          const plates = vehiclePlates[v.vin];
+          return (
+            <VehicleCard
+              key={v.id}
+              vehicle={v}
+              photo={vehiclePhotos[v.vin]}
+              plates={plates}
+              onUploadPhoto={() => { setPhotoTargetVin(v.vin); photoInputRef.current?.click(); }}
+              onDeletePhoto={() => setConfirmDeletePhoto(v.vin)}
+              onDelete={() => setConfirmDeleteId(v.id)}
+              onSavePlates={(p, e) => savePlates(v.vin, p, e)}
+            />
+          );
+        })}
 
         {vehicles.length > 0 && !showForm && (
           <Button onClick={() => setShowForm(true)} variant="outline" className="w-full">
@@ -180,6 +196,97 @@ const MiUnidad = () => {
           </Button>
         )}
       </div>
+
+      {/* Confirm Delete Vehicle */}
+      {confirmDeleteId && (
+        <div className="fixed inset-0 z-50 bg-background/80 flex items-center justify-center p-4" onClick={() => setConfirmDeleteId(null)}>
+          <div className="bg-card border border-border rounded-2xl p-6 w-full max-w-sm space-y-4 text-center" onClick={(e) => e.stopPropagation()}>
+            <AlertTriangle className="w-10 h-10 text-destructive mx-auto" />
+            <h3 className="font-bold text-foreground text-lg">¿Eliminar esta unidad?</h3>
+            <p className="text-sm text-muted-foreground">Esta acción no se puede deshacer. Se eliminará toda la información de esta unidad.</p>
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1" onClick={() => setConfirmDeleteId(null)}>Cancelar</Button>
+              <Button variant="destructive" className="flex-1" onClick={() => deleteVehicle(confirmDeleteId)}>Sí, eliminar</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Delete Photo */}
+      {confirmDeletePhoto && (
+        <div className="fixed inset-0 z-50 bg-background/80 flex items-center justify-center p-4" onClick={() => setConfirmDeletePhoto(null)}>
+          <div className="bg-card border border-border rounded-2xl p-6 w-full max-w-sm space-y-4 text-center" onClick={(e) => e.stopPropagation()}>
+            <Camera className="w-10 h-10 text-muted-foreground mx-auto" />
+            <h3 className="font-bold text-foreground">¿Eliminar la foto?</h3>
+            <p className="text-sm text-muted-foreground">La foto de tu unidad se eliminará.</p>
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1" onClick={() => setConfirmDeletePhoto(null)}>Cancelar</Button>
+              <Button variant="destructive" className="flex-1" onClick={() => deletePhoto(confirmDeletePhoto)}>Sí, eliminar</Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const VehicleCard = ({ vehicle, photo, plates, onUploadPhoto, onDeletePhoto, onDelete, onSavePlates }: {
+  vehicle: Vehicle;
+  photo?: string;
+  plates?: { placas: string; estado: string };
+  onUploadPhoto: () => void;
+  onDeletePhoto: () => void;
+  onDelete: () => void;
+  onSavePlates: (p: string, e: string) => void;
+}) => {
+  const [editPlates, setEditPlates] = useState(false);
+  const [tempPlacas, setTempPlacas] = useState(plates?.placas || "");
+  const [tempEstado, setTempEstado] = useState(plates?.estado || "");
+
+  return (
+    <div className="glass-card rounded-xl p-4 space-y-2">
+      {photo && (
+        <div className="relative">
+          <img src={photo} alt="Mi unidad" className="w-full h-32 object-cover rounded-lg" />
+          <button onClick={onDeletePhoto} className="absolute top-2 right-2 w-7 h-7 rounded-full bg-background/80 flex items-center justify-center text-destructive hover:bg-destructive hover:text-white transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+      <div className="flex items-center justify-between">
+        <h3 className="font-bold text-foreground">{vehicle.nickname || vehicle.model || "Mi Unidad"}</h3>
+        <div className="flex gap-2">
+          <button onClick={onUploadPhoto} className="text-muted-foreground hover:text-primary"><Camera className="w-4 h-4" /></button>
+          <button onClick={onDelete} className="text-muted-foreground hover:text-destructive"><Trash2 className="w-4 h-4" /></button>
+        </div>
+      </div>
+      <p className="text-xs text-muted-foreground font-mono">VIN: {vehicle.vin}</p>
+      {vehicle.model && <p className="text-sm text-foreground/80">Modelo: {vehicle.model}</p>}
+      {vehicle.year && <p className="text-sm text-foreground/80">Año: {vehicle.year}</p>}
+
+      {/* Plates section */}
+      {plates && !editPlates ? (
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-foreground/80">Placas: <span className="font-mono font-semibold">{plates.placas}</span> ({plates.estado})</p>
+          <button onClick={() => { setEditPlates(true); setTempPlacas(plates.placas); setTempEstado(plates.estado); }} className="text-xs text-primary hover:underline">Editar</button>
+        </div>
+      ) : !plates && !editPlates ? (
+        <button onClick={() => setEditPlates(true)} className="text-xs text-primary hover:underline">+ Agregar placas</button>
+      ) : null}
+
+      {editPlates && (
+        <div className="space-y-2 pt-2 border-t border-border">
+          <Input placeholder="Placas" value={tempPlacas} onChange={(e) => setTempPlacas(e.target.value)} />
+          <select value={tempEstado} onChange={(e) => setTempEstado(e.target.value)} className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm text-foreground">
+            <option value="">Estado</option>
+            {estadosMexico.map((e) => (<option key={e} value={e}>{e}</option>))}
+          </select>
+          <div className="flex gap-2">
+            <Button size="sm" className="flex-1 bg-gradient-gold text-white" onClick={() => { onSavePlates(tempPlacas, tempEstado); setEditPlates(false); }}>Guardar</Button>
+            <Button size="sm" variant="outline" onClick={() => setEditPlates(false)}>Cancelar</Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

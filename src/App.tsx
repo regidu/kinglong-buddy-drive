@@ -24,6 +24,7 @@ import Terminos from "./pages/Terminos";
 import Garantias from "./pages/Garantias";
 import Sugerencias from "./pages/Sugerencias";
 import Manual from "./pages/Manual";
+import Precios from "./pages/Precios";
 import KingoRunner from "./pages/KingoRunner";
 import NotFound from "./pages/NotFound";
 import LoadingScreen from "./components/LoadingScreen";
@@ -62,6 +63,7 @@ const AppRoutes = () => {
         <Route path="/garantias" element={<ProtectedRoute><Garantias /></ProtectedRoute>} />
         <Route path="/sugerencias" element={<ProtectedRoute><Sugerencias /></ProtectedRoute>} />
         <Route path="/manual" element={<ProtectedRoute><Manual /></ProtectedRoute>} />
+        <Route path="/precios" element={<ProtectedRoute><Precios /></ProtectedRoute>} />
         <Route path="/juego" element={<ProtectedRoute><KingoRunner /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
