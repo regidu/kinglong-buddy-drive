@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   Phone, ShoppingCart, Calculator, Lightbulb,
-  MapPin, Fuel, AlertTriangle, BookOpen, Car, MessageCircle, Bell, LogOut, Shield, UserCircle, MessageSquare, Handshake, Megaphone, FileText, Gamepad2, ChevronLeft, ChevronRight
+  MapPin, Fuel, AlertTriangle, BookOpen, Car, MessageCircle, Bell, LogOut, Shield, UserCircle, MessageSquare, Handshake, Megaphone, FileText, Gamepad2, ChevronLeft, ChevronRight, DollarSign
 } from "lucide-react";
 import heroImage from "@/assets/hero-minivan.jpg";
 import hero1 from "@/assets/hero-1.png";
@@ -35,6 +35,7 @@ const quickServices = [
   { icon: <MapPin className="w-5 h-5" />, title: "Mapa de Servicios", desc: "Puntos de venta, talleres y más", path: "/mapa" },
   { icon: <MessageCircle className="w-5 h-5" />, title: "Soporte", desc: "Chat con nuestro equipo", path: "/soporte" },
   { icon: <Calculator className="w-5 h-5" />, title: "Simula tu Crédito", desc: "Nueva unidad King Long", path: "/credito" },
+  { icon: <DollarSign className="w-5 h-5" />, title: "Precios", desc: "Catálogo de unidades", path: "/precios" },
   { icon: <Fuel className="w-5 h-5" />, title: "Calculadora Gas", desc: "Calcula tu consumo", path: "/gasolina" },
   { icon: <Lightbulb className="w-5 h-5" />, title: "Consejos", desc: "Tips para tu unidad", path: "/consejos" },
   { icon: <BookOpen className="w-5 h-5" />, title: "Historia", desc: "Conoce la marca King Long", path: "/historia" },
@@ -55,10 +56,8 @@ const Index = () => {
   const [currentImage, setCurrentImage] = useState(0);
   const [avatar, setAvatar] = useState<string | null>(null);
   const [avatarBg, setAvatarBg] = useState("bg-red-100");
-  const [userImages, setUserImages] = useState<string[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const heroImages = [...defaultHeroImages, ...userImages];
+  const heroImages = defaultHeroImages;
 
   useEffect(() => {
     if (user) {
@@ -66,11 +65,6 @@ const Index = () => {
       setAvatarBg(user.user_metadata?.avatar_bg || "bg-red-100");
     }
   }, [user]);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("user_carousel_images");
-    if (saved) setUserImages(JSON.parse(saved));
-  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -93,20 +87,6 @@ const Index = () => {
     } else {
       window.open("https://wa.me/528712196410?text=Hola, me interesa conocer más sobre las novedades King Long", "_blank");
     }
-  };
-
-  const handleAddImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      const updated = [...userImages, result];
-      setUserImages(updated);
-      localStorage.setItem("user_carousel_images", JSON.stringify(updated));
-    };
-    reader.readAsDataURL(file);
-    e.target.value = "";
   };
 
   return (

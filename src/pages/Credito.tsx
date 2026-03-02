@@ -1,22 +1,102 @@
 import { useState } from "react";
-import { Calculator, Check } from "lucide-react";
+import { Calculator, Check, Info, X, Phone } from "lucide-react";
+import unitPanelCerrada from "@/assets/unit-panel-cerrada.png";
+import unitPanelVentanas from "@/assets/unit-panel-ventanas.png";
+import unitPanelVentanasAA from "@/assets/unit-panel-ventanas-aa.png";
+import unit16Pasajeros from "@/assets/unit-16-pasajeros.png";
+import unitKingoEV from "@/assets/unit-kingo-ev.png";
 
 const unidades = [
-  { nombre: "Kingo Cargo A/A", precio: 459900 },
-  { nombre: "Kingo Panel Ventanas", precio: 449900 },
-  { nombre: "Kingo Panel Ventanas A/A", precio: 469900 },
-  { nombre: "Kingo Semi Equipada", precio: 489900 },
-  { nombre: "Kingo Equipada 16 Pasajeros", precio: 529900 },
-  { nombre: "Kingo EV (Eléctrica)", precio: 699900 },
-  { nombre: "Fourgo Cargo", precio: 459900 },
+  {
+    nombre: "Panel Cerrada",
+    precio: 635900,
+    imagen: unitPanelCerrada,
+    specs: [
+      "Motor 2.4 L",
+      "Sistema de frenado ABS + EBD",
+      "5 velocidades + reversa",
+      "Rendimiento de 9.1 Km/L combinado",
+      "Faros de niebla de halógeno",
+      "Sensor de reversa auditivo",
+      "Luces diurnas horizontales",
+      "Área de carga de 9.8 m³",
+      "Capacidad de carga 1,175 Kg",
+    ],
+  },
+  {
+    nombre: "Panel Ventanas",
+    precio: 599900,
+    imagen: unitPanelVentanas,
+    specs: [
+      "Motor 2.4 L",
+      "Sistema de frenado ABS + EBD",
+      "5 velocidades + reversa",
+      "Rendimiento de 9.1 Km/L combinado",
+      "Faros de niebla de halógeno",
+      "Sensor de reversa auditivo",
+      "Luces diurnas horizontales",
+      "Área de carga de 9.8 m³",
+      "Capacidad de carga 1,175 Kg",
+    ],
+  },
+  {
+    nombre: "Panel Ventanas A/A",
+    precio: 624900,
+    imagen: unitPanelVentanasAA,
+    specs: [
+      "Motor 2.4 L",
+      "Sistema de frenado ABS + EBD",
+      "5 velocidades + reversa",
+      "Rendimiento de 9.1 Km/L combinado",
+      "Faros de niebla de halógeno",
+      "Sensor de reversa auditivo",
+      "Luces diurnas horizontales",
+      "Área de carga de 9.8 m³",
+      "Capacidad de carga 1,175 Kg",
+      "A/C doble zona",
+    ],
+  },
+  {
+    nombre: "16 Pasajeros",
+    precio: 769900,
+    imagen: unit16Pasajeros,
+    specs: [
+      "Motor 2.4 L",
+      "Sistema de frenado ABS + EBD",
+      "5 velocidades + reversa",
+      "Rendimiento de 9.1 Km/L combinado",
+      "Faros de niebla de halógeno",
+      "Sensor de reversa auditivo",
+      "Luces diurnas horizontales",
+      "16 asientos con seguridad",
+      "A/C doble zona",
+    ],
+  },
+  {
+    nombre: "Kingo EV",
+    precio: 1449000,
+    imagen: unitKingoEV,
+    specs: [
+      "Motor 258.15 HP",
+      "Sistema de frenado ABS + EBD",
+      "CATL de 70.479 kWh",
+      "≤2 horas a carga rápida",
+      "Faros de niebla de halógeno",
+      "Sensor de reversa auditivo",
+      "Luces diurnas horizontales",
+      "16 asientos con seguridad",
+      "A/C doble zona",
+    ],
+  },
 ];
 
 const Credito = () => {
   const [selectedUnit, setSelectedUnit] = useState<number | null>(null);
-  const [monto, setMonto] = useState(500000);
+  const [monto, setMonto] = useState(600000);
   const [enganche, setEnganche] = useState(20);
   const [plazo, setPlazo] = useState(36);
   const [tasa, setTasa] = useState(14.5);
+  const [infoUnit, setInfoUnit] = useState<number | null>(null);
 
   const precio = selectedUnit !== null ? unidades[selectedUnit].precio : monto;
   const montoFinanciado = precio * (1 - enganche / 100);
@@ -51,18 +131,34 @@ const Credito = () => {
                     : "border-border bg-card hover:border-primary/40"
                 }`}
               >
-                <div>
-                  <p className={`text-sm font-semibold ${selectedUnit === i ? "text-primary" : "text-card-foreground"}`}>{u.nombre}</p>
-                  <p className="text-xs text-muted-foreground">Precio de lista</p>
+                <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <img src={u.imagen} alt={u.nombre} className="w-16 h-10 object-contain rounded flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className={`text-sm font-semibold truncate ${selectedUnit === i ? "text-primary" : "text-card-foreground"}`}>{u.nombre}</p>
+                    <p className="text-xs text-muted-foreground">IVA incluido</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 flex-shrink-0">
                   <span className={`font-bold text-sm ${selectedUnit === i ? "text-primary" : "text-foreground"}`}>{formatMoney(u.precio)}</span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setInfoUnit(i); }}
+                    className="w-7 h-7 rounded-full flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                  >
+                    <Info className="w-4 h-4" />
+                  </button>
                   {selectedUnit === i && <Check className="w-4 h-4 text-primary" />}
                 </div>
               </button>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground mt-2 text-center">Precios sujetos a cambios. Consulta kinglong.mx</p>
+          <p className="text-xs text-muted-foreground mt-2 text-center">
+            ⚠️ Precios sujetos a cambios sin previo aviso. Consulta con tu asesor de ventas para confirmar el precio vigente.
+          </p>
+          <div className="mt-2 text-center">
+            <a href="https://wa.me/528712196410?text=Hola, quiero confirmar el precio de una unidad King Long" target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline inline-flex items-center gap-1">
+              <Phone className="w-3 h-3" /> Llamar a un asesor de ventas
+            </a>
+          </div>
         </div>
 
         {/* Manual price if no unit selected */}
@@ -72,11 +168,7 @@ const Credito = () => {
               <label className="text-sm font-medium text-foreground">Precio personalizado</label>
               <span className="text-primary font-bold">{formatMoney(monto)}</span>
             </div>
-            <input
-              type="range" min={450000} max={2000000} step={50000}
-              value={monto} onChange={(e) => setMonto(Number(e.target.value))}
-              className="w-full accent-primary"
-            />
+            <input type="range" min={450000} max={2000000} step={50000} value={monto} onChange={(e) => setMonto(Number(e.target.value))} className="w-full accent-primary" />
             <div className="flex justify-between text-xs text-muted-foreground mt-1">
               <span>$450K</span><span>$2M</span>
             </div>
@@ -89,11 +181,7 @@ const Credito = () => {
             <label className="text-sm font-medium text-foreground">Enganche</label>
             <span className="text-primary font-bold">{enganche}% ({formatMoney(precio * enganche / 100)})</span>
           </div>
-          <input
-            type="range" min={20} max={80} step={5}
-            value={enganche} onChange={(e) => setEnganche(Number(e.target.value))}
-            className="w-full accent-primary"
-          />
+          <input type="range" min={20} max={80} step={5} value={enganche} onChange={(e) => setEnganche(Number(e.target.value))} className="w-full accent-primary" />
           <div className="flex justify-between text-xs text-muted-foreground mt-1">
             <span>20%</span><span>80%</span>
           </div>
@@ -125,11 +213,7 @@ const Credito = () => {
             <label className="text-sm font-medium text-foreground">Tasa de interés anual</label>
             <span className="text-primary font-bold">{tasa}%</span>
           </div>
-          <input
-            type="range" min={8} max={25} step={0.5}
-            value={tasa} onChange={(e) => setTasa(Number(e.target.value))}
-            className="w-full accent-primary"
-          />
+          <input type="range" min={8} max={25} step={0.5} value={tasa} onChange={(e) => setTasa(Number(e.target.value))} className="w-full accent-primary" />
           <div className="flex justify-between text-xs text-muted-foreground mt-1">
             <span>8%</span><span>25%</span>
           </div>
@@ -146,9 +230,40 @@ const Credito = () => {
         </div>
 
         <p className="text-xs text-muted-foreground text-center">
-          * Simulación con fines informativos. Sujeto a aprobación crediticia.
+          * Simulación con fines informativos. Sujeto a aprobación crediticia. Los precios pueden variar sin previo aviso; contacta a un asesor de ventas para confirmar.
         </p>
       </div>
+
+      {/* Info Modal */}
+      {infoUnit !== null && (
+        <div className="fixed inset-0 z-50 bg-background/80 flex items-center justify-center p-4" onClick={() => setInfoUnit(null)}>
+          <div className="bg-card border border-border rounded-2xl w-full max-w-sm p-5 space-y-4 relative" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setInfoUnit(null)} className="absolute top-3 right-3 text-muted-foreground hover:text-foreground">
+              <X className="w-5 h-5" />
+            </button>
+            <img src={unidades[infoUnit].imagen} alt={unidades[infoUnit].nombre} className="w-full h-32 object-contain" />
+            <h3 className="text-lg font-bold text-foreground text-center">{unidades[infoUnit].nombre}</h3>
+            <p className="text-2xl font-extrabold text-gradient-gold text-center">{formatMoney(unidades[infoUnit].precio)}</p>
+            <p className="text-xs text-muted-foreground text-center">IVA incluido</p>
+            <ul className="space-y-1.5">
+              {unidades[infoUnit].specs.map((s, j) => (
+                <li key={j} className="flex items-start gap-2 text-sm text-foreground">
+                  <Check className="w-3.5 h-3.5 text-primary mt-0.5 flex-shrink-0" />
+                  {s}
+                </li>
+              ))}
+            </ul>
+            <p className="text-xs text-muted-foreground text-center">⚠️ Precios sujetos a cambios. Consulta con tu asesor.</p>
+            <a
+              href={`https://wa.me/528712196410?text=Hola, me interesa la unidad ${unidades[infoUnit].nombre} (${formatMoney(unidades[infoUnit].precio)})`}
+              target="_blank" rel="noopener noreferrer"
+              className="block w-full text-center py-3 rounded-xl bg-gradient-gold text-white font-semibold text-sm"
+            >
+              <Phone className="w-4 h-4 inline mr-1" /> Contactar asesor de ventas
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

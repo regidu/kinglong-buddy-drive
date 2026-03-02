@@ -5,20 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { User, Lock, Eye, EyeOff, Save, Cake, Check, X } from "lucide-react";
 import { toast } from "sonner";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const animalAvatars = [
-  { emoji: "🐼", name: "Panda" },
-  { emoji: "🐉", name: "Dragón" },
-  { emoji: "🐅", name: "Tigre" },
-  { emoji: "🐒", name: "Mono" },
-  { emoji: "🐍", name: "Serpiente" },
-  { emoji: "🐇", name: "Conejo" },
-  { emoji: "🐓", name: "Gallo" },
-  { emoji: "🐖", name: "Cerdo" },
-  { emoji: "🐀", name: "Rata" },
-  { emoji: "🐂", name: "Buey" },
-  { emoji: "🐴", name: "Caballo" },
-  { emoji: "🐑", name: "Cabra" },
+  { emoji: "🐼", name: "Panda" }, { emoji: "🐉", name: "Dragón" }, { emoji: "🐅", name: "Tigre" },
+  { emoji: "🐒", name: "Mono" }, { emoji: "🐍", name: "Serpiente" }, { emoji: "🐇", name: "Conejo" },
+  { emoji: "🐓", name: "Gallo" }, { emoji: "🐖", name: "Cerdo" }, { emoji: "🐀", name: "Rata" },
+  { emoji: "🐂", name: "Buey" }, { emoji: "🐴", name: "Caballo" }, { emoji: "🐑", name: "Cabra" },
 ];
 
 const bgColors = [
@@ -32,6 +25,20 @@ const bgColors = [
   { value: "bg-gray-100", label: "Gris", ring: "ring-gray-300" },
 ];
 
+const ladaOptions = [
+  { code: "+52", country: "🇲🇽 México" },
+  { code: "+1", country: "🇺🇸 EE.UU." },
+  { code: "+57", country: "🇨🇴 Colombia" },
+  { code: "+54", country: "🇦🇷 Argentina" },
+  { code: "+56", country: "🇨🇱 Chile" },
+  { code: "+51", country: "🇵🇪 Perú" },
+  { code: "+593", country: "🇪🇨 Ecuador" },
+  { code: "+502", country: "🇬🇹 Guatemala" },
+  { code: "+503", country: "🇸🇻 El Salvador" },
+  { code: "+504", country: "🇭🇳 Honduras" },
+  { code: "+34", country: "🇪🇸 España" },
+];
+
 const passwordRules = [
   { label: "Mínimo 8 caracteres", test: (p: string) => p.length >= 8 },
   { label: "Una letra mayúscula", test: (p: string) => /[A-Z]/.test(p) },
@@ -43,6 +50,7 @@ const passwordRules = [
 const Perfil = () => {
   const { user } = useAuth();
   const [fullName, setFullName] = useState("");
+  const [lada, setLada] = useState("+52");
   const [phone, setPhone] = useState("");
   const [birthday, setBirthday] = useState("");
   const [loading, setLoading] = useState(true);
@@ -50,9 +58,11 @@ const Perfil = () => {
   const [avatarBg, setAvatarBg] = useState("bg-red-100");
 
   const [showPwSection, setShowPwSection] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
+  const [showCurrentPw, setShowCurrentPw] = useState(false);
   const [pwLoading, setPwLoading] = useState(false);
 
   const allRulesPass = passwordRules.every((r) => r.test(newPassword));
@@ -63,7 +73,15 @@ const Perfil = () => {
     supabase.from("profiles").select("*").eq("user_id", user.id).single().then(({ data }) => {
       if (data) {
         setFullName(data.full_name || "");
-        setPhone(data.phone || "");
+        const savedPhone = data.phone || "";
+        // Parse lada from saved phone
+        const ladaMatch = ladaOptions.find((l) => savedPhone.startsWith(l.code));
+        if (ladaMatch) {
+          setLada(ladaMatch.code);
+          setPhone(savedPhone.replace(ladaMatch.code, "").trim());
+        } else {
+          setPhone(savedPhone);
+        }
       }
       setLoading(false);
     });
@@ -74,26 +92,37 @@ const Perfil = () => {
 
   const saveProfile = async () => {
     if (!user) return;
-    const { error } = await supabase.from("profiles").update({ full_name: fullName, phone }).eq("user_id", user.id);
+    const fullPhone = `${lada}${phone}`;
+    const { error } = await supabase.from("profiles").update({ full_name: fullName, phone: fullPhone }).eq("user_id", user.id);
     if (error) { toast.error("Error al guardar"); return; }
     await supabase.auth.updateUser({ data: { birthday, avatar, avatar_bg: avatarBg } });
     toast.success("Perfil actualizado");
   };
 
   const changePassword = async () => {
+    if (!currentPassword) { toast.error("Ingresa tu contraseña actual"); return; }
     if (!allRulesPass) { toast.error("La contraseña no cumple los requisitos"); return; }
     if (!passwordsMatch) { toast.error("Las contraseñas no coinciden"); return; }
     setPwLoading(true);
+    // Verify current password by re-signing in
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email: user?.email || "",
+      password: currentPassword,
+    });
+    if (signInError) {
+      setPwLoading(false);
+      toast.error("La contraseña actual es incorrecta");
+      return;
+    }
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     setPwLoading(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Contraseña actualizada");
-    setNewPassword("");
-    setConfirmPassword("");
+    setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
     setShowPwSection(false);
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Cargando...</div>;
+  if (loading) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen pb-24 px-4 pt-6">
@@ -108,18 +137,11 @@ const Perfil = () => {
         </div>
         <div className="flex items-center gap-3 mb-2">
           <p className="text-sm font-medium text-foreground">Elige tu avatar</p>
-          {avatar && (
-            <button onClick={() => setAvatar("")} className="text-xs text-destructive hover:underline">Quitar avatar</button>
-          )}
+          {avatar && (<button onClick={() => setAvatar("")} className="text-xs text-destructive hover:underline">Quitar avatar</button>)}
         </div>
         <div className="flex flex-wrap justify-center gap-2 mb-3">
           {animalAvatars.map((a) => (
-            <button
-              key={a.emoji}
-              onClick={() => setAvatar(a.emoji)}
-              className={`w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all ${avatar === a.emoji ? "ring-2 ring-primary scale-110" : "hover:scale-105"}`}
-              title={a.name}
-            >
+            <button key={a.emoji} onClick={() => setAvatar(a.emoji)} className={`w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all ${avatar === a.emoji ? "ring-2 ring-primary scale-110" : "hover:scale-105"}`} title={a.name}>
               {a.emoji}
             </button>
           ))}
@@ -127,12 +149,7 @@ const Perfil = () => {
         <p className="text-xs text-muted-foreground mb-2">Color de fondo</p>
         <div className="flex gap-2">
           {bgColors.map((c) => (
-            <button
-              key={c.value}
-              onClick={() => setAvatarBg(c.value)}
-              className={`w-7 h-7 rounded-full ${c.value} transition-all ${avatarBg === c.value ? `ring-2 ${c.ring} scale-110` : "hover:scale-105"}`}
-              title={c.label}
-            />
+            <button key={c.value} onClick={() => setAvatarBg(c.value)} className={`w-7 h-7 rounded-full ${c.value} transition-all ${avatarBg === c.value ? `ring-2 ${c.ring} scale-110` : "hover:scale-105"}`} title={c.label} />
           ))}
         </div>
       </div>
@@ -148,7 +165,12 @@ const Perfil = () => {
         </div>
         <div>
           <label className="text-sm font-medium text-foreground">Teléfono</label>
-          <Input value={phone} onChange={(e) => setPhone(e.target.value)} className="mt-1" placeholder="+52..." />
+          <div className="flex gap-2 mt-1">
+            <select value={lada} onChange={(e) => setLada(e.target.value)} className="w-32 h-10 rounded-md border border-input bg-background px-2 text-sm text-foreground">
+              {ladaOptions.map((l) => (<option key={l.code} value={l.code}>{l.country} {l.code}</option>))}
+            </select>
+            <Input value={phone} onChange={(e) => setPhone(e.target.value)} className="flex-1" placeholder="Número" />
+          </div>
         </div>
         <div>
           <label className="text-sm font-medium text-foreground flex items-center gap-1">
@@ -169,26 +191,24 @@ const Perfil = () => {
             <div className="mt-3 space-y-3">
               <div className="relative">
                 <Input
-                  type={showPw ? "text" : "password"}
-                  placeholder="Nueva contraseña"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
+                  type={showCurrentPw ? "text" : "password"}
+                  placeholder="Contraseña actual"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
                   className="pr-10"
-                  minLength={8}
                 />
+                <button type="button" onClick={() => setShowCurrentPw(!showCurrentPw)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground">
+                  {showCurrentPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              <div className="relative">
+                <Input type={showPw ? "text" : "password"} placeholder="Nueva contraseña" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="pr-10" minLength={8} />
                 <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground">
                   {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               <div className="relative">
-                <Input
-                  type={showPw ? "text" : "password"}
-                  placeholder="Confirmar contraseña"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="pr-10"
-                  minLength={8}
-                />
+                <Input type={showPw ? "text" : "password"} placeholder="Confirmar nueva contraseña" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="pr-10" minLength={8} />
                 {confirmPassword.length > 0 && (
                   <span className="absolute right-3 top-3">
                     {passwordsMatch ? <Check className="w-4 h-4 text-green-500" /> : <X className="w-4 h-4 text-destructive" />}
@@ -208,7 +228,7 @@ const Perfil = () => {
                   })}
                 </div>
               )}
-              <Button onClick={changePassword} disabled={pwLoading || !allRulesPass || !passwordsMatch} variant="outline" className="w-full">
+              <Button onClick={changePassword} disabled={pwLoading || !allRulesPass || !passwordsMatch || !currentPassword} variant="outline" className="w-full">
                 {pwLoading ? "Guardando..." : "Actualizar contraseña"}
               </Button>
             </div>
