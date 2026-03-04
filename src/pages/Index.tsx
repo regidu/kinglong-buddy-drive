@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import {
   Phone, ShoppingCart, Calculator, Lightbulb,
-  MapPin, Fuel, AlertTriangle, BookOpen, Car, MessageCircle, Bell, LogOut, Shield, UserCircle, MessageSquare, Handshake, Megaphone, FileText, Gamepad2, ChevronLeft, ChevronRight, DollarSign
+  MapPin, Fuel, AlertTriangle, BookOpen, Car, MessageCircle, Bell, LogOut, Shield, UserCircle, MessageSquare, Handshake, Megaphone, FileText, Gamepad2, ChevronLeft, ChevronRight, DollarSign, Settings
 } from "lucide-react";
 import heroImage from "@/assets/hero-minivan.jpg";
 import hero1 from "@/assets/hero-1.png";
@@ -42,6 +42,7 @@ const quickServices = [
   { icon: <MessageSquare className="w-5 h-5" />, title: "Sugerencias", desc: "Déjanos tu opinión", path: "/sugerencias" },
   { icon: <Gamepad2 className="w-5 h-5" />, title: "Kingo Runner", desc: "¡Juega y diviértete!", path: "/juego" },
   { icon: <Handshake className="w-5 h-5" />, title: "Sé Distribuidor", desc: "Únete a la red King Long", path: "https://kinglong.mx/distri/distribuidores.html?srsltid=AfmBOoql9BYW0GU0BXHqN8BxDJ7oI7mNs4A8fZbFbT7Nmr1330RWafTn", external: true },
+  { icon: <Settings className="w-5 h-5" />, title: "Configuración", desc: "Tema oscuro y notificaciones", path: "/configuracion" },
 ];
 
 const novedades = [

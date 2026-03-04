@@ -26,8 +26,10 @@ import Sugerencias from "./pages/Sugerencias";
 import Manual from "./pages/Manual";
 import Precios from "./pages/Precios";
 import KingoRunner from "./pages/KingoRunner";
+import Configuracion from "./pages/Configuracion";
 import NotFound from "./pages/NotFound";
 import LoadingScreen from "./components/LoadingScreen";
+import ChatbotWidget from "./components/ChatbotWidget";
 
 const queryClient = new QueryClient();
 
@@ -65,9 +67,11 @@ const AppRoutes = () => {
         <Route path="/manual" element={<ProtectedRoute><Manual /></ProtectedRoute>} />
         <Route path="/precios" element={<ProtectedRoute><Precios /></ProtectedRoute>} />
         <Route path="/juego" element={<ProtectedRoute><KingoRunner /></ProtectedRoute>} />
+        <Route path="/configuracion" element={<ProtectedRoute><Configuracion /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {user && <BottomNav />}
+      {user && <ChatbotWidget />}
     </div>
   );
 };
