@@ -55,6 +55,43 @@
     --shadow-card: 0 2px 12px -4px hsl(0 0% 0% / 0.1);
   }
 
+  .dark {
+    --background: 220 20% 10%;
+    --foreground: 0 0% 95%;
+    --card: 220 18% 14%;
+    --card-foreground: 0 0% 95%;
+    --popover: 220 18% 14%;
+    --popover-foreground: 0 0% 95%;
+    --primary: 0 73.7089% 41.7647%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 18%;
+    --secondary-foreground: 0 0% 90%;
+    --muted: 220 14% 18%;
+    --muted-foreground: 220 10% 60%;
+    --accent: 0 72.2222% 50.5882%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 22%;
+    --input: 220 13% 22%;
+    --ring: 0 73% 42%;
+    --sidebar-background: 220 18% 12%;
+    --sidebar-foreground: 0 0% 95%;
+    --sidebar-primary: 0 73% 42%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 14% 18%;
+    --sidebar-accent-foreground: 0 0% 95%;
+    --sidebar-border: 220 13% 22%;
+    --sidebar-ring: 0 73% 42%;
+    --gold: 0 73% 42%;
+    --gold-dim: 0 60% 35%;
+    --surface: 220 18% 12%;
+    --surface-hover: 220 18% 16%;
+    --gradient-gold: linear-gradient(135deg, hsl(0, 73%, 42%), hsl(0, 80%, 35%));
+    --shadow-gold: 0 4px 20px -4px hsl(0 73% 42% / 0.35);
+    --shadow-card: 0 2px 12px -4px hsl(0 0% 0% / 0.3);
+  }
+
   * {
     @apply border-border;
   }
@@ -91,7 +128,7 @@
   }
 
   .glass-card {
-    background: hsl(0, 0%, 98%);
-    border: 1px solid hsl(220, 13%, 88%);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
   }
 }
