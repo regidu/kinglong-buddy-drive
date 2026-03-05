@@ -29,7 +29,7 @@ import KingoRunner from "./pages/KingoRunner";
 import Configuracion from "./pages/Configuracion";
 import NotFound from "./pages/NotFound";
 import LoadingScreen from "./components/LoadingScreen";
-import ChatbotWidget from "./components/ChatbotWidget";
+import AppSidebar from "./components/AppSidebar";
 
 const queryClient = new QueryClient();
 
@@ -71,7 +71,7 @@ const AppRoutes = () => {
         <Route path="*" element={<NotFound />} />
       </Routes>
       {user && <BottomNav />}
-      {user && <ChatbotWidget />}
+      {user && <AppSidebar />}
     </div>
   );
 };

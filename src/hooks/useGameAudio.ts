@@ -1,5 +1,4 @@
-// Game Audio System using Web Audio API
-// All sounds are procedurally generated - no external files needed for SFX
+// Game Audio System using Web Audio API — all procedural
 
 let audioCtx: AudioContext | null = null;
 let bgMusicSource: AudioBufferSourceNode | null = null;
@@ -10,8 +9,6 @@ const getCtx = () => {
   if (!audioCtx) audioCtx = new AudioContext();
   return audioCtx;
 };
-
-// --- Procedural SFX ---
 
 export const playWoosh = () => {
   try {
@@ -60,28 +57,29 @@ export const playScore = () => {
   } catch {}
 };
 
-// --- Background Music (procedural looping melody) ---
-
+// Fun, upbeat procedural music — major key arpeggios
 const generateMusicBuffer = (ctx: AudioContext): AudioBuffer => {
-  const sampleRate = ctx.sampleRate;
-  const duration = 8; // 8 second loop
-  const length = sampleRate * duration;
-  const buffer = ctx.createBuffer(1, length, sampleRate);
+  const sr = ctx.sampleRate;
+  const duration = 4;
+  const length = sr * duration;
+  const buffer = ctx.createBuffer(1, length, sr);
   const data = buffer.getChannelData(0);
 
-  // Pentatonic scale frequencies for a Chinese-inspired melody
-  const notes = [261.6, 293.7, 329.6, 392.0, 440.0, 523.3, 587.3, 659.3];
-  const beatDuration = sampleRate * 0.25; // 16th notes at ~120bpm
+  // C major pentatonic fun melody
+  const melody = [523.3, 587.3, 659.3, 784.0, 880.0, 784.0, 659.3, 587.3,
+                   523.3, 440.0, 392.0, 440.0, 523.3, 659.3, 784.0, 880.0];
+  const beatLen = sr * (duration / melody.length);
 
-  for (let beat = 0; beat < duration / 0.25; beat++) {
-    const noteFreq = notes[beat % notes.length];
-    const startSample = Math.floor(beat * beatDuration);
-    for (let j = 0; j < beatDuration && startSample + j < length; j++) {
-      const t = j / sampleRate;
-      const envelope = Math.exp(-t * 6) * 0.08;
-      data[startSample + j] += Math.sin(2 * Math.PI * noteFreq * t) * envelope;
-      // Add a subtle harmony
-      data[startSample + j] += Math.sin(2 * Math.PI * noteFreq * 1.5 * t) * envelope * 0.3;
+  for (let b = 0; b < melody.length; b++) {
+    const freq = melody[b];
+    const start = Math.floor(b * beatLen);
+    for (let j = 0; j < beatLen && start + j < length; j++) {
+      const t = j / sr;
+      const env = Math.exp(-t * 5) * 0.07;
+      // Main + octave harmony + slight detuned for richness
+      data[start + j] += Math.sin(2 * Math.PI * freq * t) * env;
+      data[start + j] += Math.sin(2 * Math.PI * freq * 2 * t) * env * 0.25;
+      data[start + j] += Math.sin(2 * Math.PI * freq * 0.5 * t) * env * 0.15;
     }
   }
   return buffer;
@@ -105,19 +103,23 @@ export const startMusic = () => {
 };
 
 export const stopMusic = () => {
-  try {
-    bgMusicSource?.stop();
-  } catch {}
+  try { bgMusicSource?.stop(); } catch {}
   bgMusicSource = null;
   isMusicPlaying = false;
 };
 
 export const setMusicSpeed = (gameSpeed: number) => {
   if (bgMusicSource) {
-    // Map game speed (3-10) to playback rate (1.0-1.8)
-    const rate = 1.0 + (gameSpeed - 3) * 0.1;
-    bgMusicSource.playbackRate.value = Math.min(rate, 2.0);
+    // Directly proportional: speed 3 → rate 1.0, speed 8 → rate 1.5, etc.
+    const rate = 0.7 + (gameSpeed / BASE_SPD) * 0.3;
+    bgMusicSource.playbackRate.value = Math.min(Math.max(rate, 0.8), 2.5);
   }
+};
+
+const BASE_SPD = 3;
+
+export const setMusicVolume = (vol: number) => {
+  if (bgGainNode) bgGainNode.gain.value = vol;
 };
 
 export const resumeAudioContext = () => {
