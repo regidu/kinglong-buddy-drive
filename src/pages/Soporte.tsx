@@ -1,143 +1,198 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Send, MessageCircle } from "lucide-react";
+import { Send, MessageCircle, RotateCcw, ExternalLink, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo-kinglong.png";
 
-interface Message {
-  id: string;
-  user_id: string;
+const WA_URL = "https://wa.me/528711377115?text=Hola,%20vengo%20del%20chat%20de%20la%20app%20y%20necesito%20ayuda%20personalizada.";
+
+interface ChatNode {
   message: string;
-  is_from_user: boolean;
-  created_at: string;
+  options: { label: string; next: string }[];
+  navLink?: { label: string; path: string };
 }
 
-const TypingIndicator = () => (
-  <div className="flex justify-start">
-    <div className="glass-card rounded-2xl rounded-bl-md px-4 py-3 flex items-center gap-1">
-      <span className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:0ms]" />
-      <span className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:150ms]" />
-      <span className="w-2 h-2 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:300ms]" />
-    </div>
-  </div>
-);
+const chatTree: Record<string, ChatNode> = {
+  root: {
+    message: "¡Hola! 👋 Soy Killy, tu asistente virtual King Long. ¿En qué puedo ayudarte?",
+    options: [
+      { label: "🚐 Unidades y Precios", next: "unidades" },
+      { label: "🔧 Servicio y Mantenimiento", next: "servicio" },
+      { label: "📋 Garantías", next: "garantias" },
+      { label: "💰 Simular Crédito", next: "credito" },
+      { label: "🆘 Asistencia Vial", next: "asistencia" },
+      { label: "👤 Hablar con un asesor", next: "whatsapp" },
+    ],
+  },
+  unidades: {
+    message: "Tenemos una línea completa de unidades King Long. ¿Cuál te interesa?",
+    options: [
+      { label: "Panel Cerrada - $635,900", next: "unit_panel_cerrada" },
+      { label: "Panel Ventanas - $599,900", next: "unit_panel_ventanas" },
+      { label: "Panel Ventanas A/A - $624,900", next: "unit_panel_aa" },
+      { label: "16 Pasajeros - $769,900", next: "unit_16" },
+      { label: "Kingo EV - $1,449,000", next: "unit_ev" },
+    ],
+    navLink: { label: "Ver catálogo de precios", path: "/precios" },
+  },
+  unit_panel_cerrada: {
+    message: "🚐 Panel Cerrada — $635,900 IVA incluido\n\n• Motor 2.4L\n• ABS + EBD\n• 5 velocidades + reversa\n• Rendimiento 9.1 Km/L\n• Área de carga 9.8m³\n• Capacidad 1,175 Kg\n\nPrecios sujetos a cambios.",
+    options: [{ label: "💰 Simular crédito", next: "credito" }, { label: "👤 Hablar con asesor", next: "whatsapp" }],
+    navLink: { label: "Ir al simulador de crédito", path: "/credito" },
+  },
+  unit_panel_ventanas: {
+    message: "🚐 Panel Ventanas — $599,900 IVA incluido\n\n• Motor 2.4L\n• ABS + EBD\n• 5 velocidades + reversa\n• Rendimiento 9.1 Km/L\n• Área de carga 9.8m³\n• Capacidad 1,175 Kg\n\nPrecios sujetos a cambios.",
+    options: [{ label: "💰 Simular crédito", next: "credito" }, { label: "👤 Hablar con asesor", next: "whatsapp" }],
+    navLink: { label: "Ir al simulador de crédito", path: "/credito" },
+  },
+  unit_panel_aa: {
+    message: "🚐 Panel Ventanas A/A — $624,900 IVA incluido\n\n• Motor 2.4L\n• ABS + EBD\n• A/C doble zona\n• Área de carga 9.8m³\n• Capacidad 1,175 Kg\n\nPrecios sujetos a cambios.",
+    options: [{ label: "💰 Simular crédito", next: "credito" }, { label: "👤 Hablar con asesor", next: "whatsapp" }],
+    navLink: { label: "Ir al simulador de crédito", path: "/credito" },
+  },
+  unit_16: {
+    message: "🚐 16 Pasajeros — $769,900 IVA incluido\n\n• Motor 2.4L\n• ABS + EBD\n• 16 asientos\n• A/C doble zona\n\nPrecios sujetos a cambios.",
+    options: [{ label: "💰 Simular crédito", next: "credito" }, { label: "👤 Hablar con asesor", next: "whatsapp" }],
+    navLink: { label: "Ir al simulador de crédito", path: "/credito" },
+  },
+  unit_ev: {
+    message: "⚡ Kingo EV — $1,449,000 IVA incluido\n\n• Motor 258.15 HP\n• CATL 70.479 kWh\n• Carga rápida ≤2 hrs\n• 16 asientos\n• A/C doble zona\n\nPrecios sujetos a cambios.",
+    options: [{ label: "💰 Simular crédito", next: "credito" }, { label: "👤 Hablar con asesor", next: "whatsapp" }],
+    navLink: { label: "Ir al simulador de crédito", path: "/credito" },
+  },
+  servicio: {
+    message: "¿Qué necesitas sobre servicio y mantenimiento?",
+    options: [
+      { label: "📅 Agendar mantenimiento", next: "agendar" },
+      { label: "🗺️ Buscar taller cercano", next: "taller" },
+      { label: "🔩 Pedir refacciones", next: "refacciones" },
+      { label: "📖 Ver manual de uso", next: "manual" },
+    ],
+  },
+  agendar: {
+    message: "Para agendar tu mantenimiento, puedes hacerlo desde la sección de Recordatorios en la app, o contacta directamente a tu taller autorizado más cercano.",
+    options: [{ label: "📞 Contactar taller", next: "whatsapp" }],
+    navLink: { label: "Ir a Recordatorios", path: "/recordatorios" },
+  },
+  taller: {
+    message: "Encuentra tu taller autorizado en la sección Mapa de Servicios de la app. Ahí verás talleres, vulcanizadoras y puntos de venta cercanos.",
+    options: [{ label: "👤 Necesito más ayuda", next: "whatsapp" }],
+    navLink: { label: "Ir al Mapa de Servicios", path: "/mapa" },
+  },
+  refacciones: {
+    message: "Consulta nuestro Catálogo de Refacciones en la app. Cada producto tiene un enlace directo a Mercado Libre para su compra.",
+    options: [{ label: "👤 Necesito ayuda", next: "whatsapp" }],
+    navLink: { label: "Ir a Refacciones", path: "/refacciones" },
+  },
+  manual: {
+    message: "Accede al manual de tu unidad en la sección Manual de Uso:\n• Manual KINGO — Modelos 2025 en adelante\n• Manual FOURGO — Modelos 2022-2024",
+    options: [{ label: "👤 Más información", next: "whatsapp" }],
+    navLink: { label: "Ir al Manual", path: "/manual" },
+  },
+  garantias: {
+    message: "Tu garantía King Long cubre componentes principales. Para reportar una falla:\n\n1. Ve a Garantías en la app\n2. Describe el problema\n3. Un asesor te contactará",
+    options: [{ label: "📝 Reportar falla", next: "whatsapp" }],
+    navLink: { label: "Ir a Garantías", path: "/garantias" },
+  },
+  credito: {
+    message: "Usa el Simulador de Crédito en la app para calcular tus mensualidades. Selecciona tu unidad y ajusta el enganche y plazo.\n\n¿Quieres que un asesor financiero te contacte?",
+    options: [{ label: "👤 Sí, contactar asesor", next: "whatsapp" }],
+    navLink: { label: "Ir al Simulador de Crédito", path: "/credito" },
+  },
+  asistencia: {
+    message: "🆘 Para Asistencia Vial de Emergencia, usa el botón rojo en la pantalla principal de la app o contacta directamente:",
+    options: [{ label: "📞 Llamar ahora", next: "whatsapp" }],
+    navLink: { label: "Ir a Asistencia Vial", path: "/asistencia" },
+  },
+  whatsapp: {
+    message: "Te conectaremos con un asesor King Long por WhatsApp. Toca el botón para iniciar la conversación. 👇",
+    options: [],
+  },
+};
+
+interface BubbleMsg {
+  from: "bot" | "user";
+  text: string;
+  navLink?: { label: string; path: string };
+}
 
 const Soporte = () => {
   const { user } = useAuth();
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [sending, setSending] = useState(false);
-  const [typing, setTyping] = useState(false);
+  const navigate = useNavigate();
+  const [messages, setMessages] = useState<BubbleMsg[]>([
+    { from: "bot", text: chatTree.root.message },
+  ]);
+  const [currentNode, setCurrentNode] = useState("root");
   const bottomRef = useRef<HTMLDivElement>(null);
   const avatar = user?.user_metadata?.avatar || null;
   const avatarBg = user?.user_metadata?.avatar_bg || "bg-red-100";
 
   useEffect(() => {
-    if (!user) return;
-    fetchMessages();
-
-    const channel = supabase
-      .channel("support-messages")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "support_messages" }, (payload) => {
-        const msg = payload.new as Message;
-        if (msg.user_id === user.id) {
-          setMessages((prev) => [...prev, msg]);
-          setTyping(false);
-        }
-      })
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
-  }, [user]);
-
-  useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, typing]);
+  }, [messages]);
 
-  const fetchMessages = async () => {
-    const { data } = await supabase
-      .from("support_messages")
-      .select("*")
-      .order("created_at", { ascending: true });
-    if (data) {
-      if (data.length === 0) {
-        // Insert Killy welcome
-        const { data: welcome } = await supabase.from("support_messages").insert({
-          user_id: user!.id,
-          message: "¡Hola! 👋 Soy Killy, tu asistente King Long. Estoy aquí para ayudarte con cualquier duda o situación. ¿En qué puedo servirte hoy?",
-          is_from_user: false,
-        }).select().single();
-        if (welcome) setMessages([welcome as Message]);
-      } else {
-        setMessages(data as Message[]);
-      }
-    }
+  const handleOption = (label: string, next: string) => {
+    const node = chatTree[next];
+    if (!node) return;
+    setMessages((prev) => [...prev, { from: "user", text: label }]);
+    setTimeout(() => {
+      setMessages((prev) => [...prev, { from: "bot", text: node.message, navLink: node.navLink }]);
+      setCurrentNode(next);
+    }, 400);
   };
 
-  const sendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim() || !user) return;
-    setSending(true);
-
-    const { error } = await supabase.from("support_messages").insert({
-      user_id: user.id,
-      message: newMessage.trim(),
-      is_from_user: true,
-    });
-
-    if (error) {
-      toast.error("Error al enviar mensaje");
-    } else {
-      setNewMessage("");
-      setTyping(true);
-      setTimeout(async () => {
-        await supabase.from("support_messages").insert({
-          user_id: user.id,
-          message: "¡Gracias por contactarnos! Un asesor King Long te responderá pronto. Horario de atención: Lun-Vie 9:00 - 18:00",
-          is_from_user: false,
-        });
-      }, 1500);
-    }
-    setSending(false);
+  const resetChat = () => {
+    setMessages([{ from: "bot", text: chatTree.root.message }]);
+    setCurrentNode("root");
   };
+
+  const node = chatTree[currentNode];
 
   return (
     <div className="min-h-screen flex flex-col pb-20 pt-safe">
-      <div className="px-4 py-3 border-b border-border">
-        <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
-          <MessageCircle className="w-5 h-5 text-primary" />
-          Soporte King Long
-        </h1>
-        <p className="text-xs text-muted-foreground">Chat con Killy, tu asistente</p>
+      <div className="px-4 py-3 border-b border-border flex items-center gap-2">
+        <img src={logo} alt="Killy" className="w-8 h-8 rounded-full bg-card border border-border object-contain" />
+        <div className="flex-1">
+          <h1 className="text-lg font-bold text-foreground flex items-center gap-2">
+            <MessageCircle className="w-5 h-5 text-primary" />
+            Killy — Asistente King Long
+          </h1>
+          <p className="text-xs text-muted-foreground">Tu asistente virtual inteligente</p>
+        </div>
+        <button onClick={resetChat} className="p-2 rounded-lg hover:bg-muted text-muted-foreground">
+          <RotateCcw className="w-4 h-4" />
+        </button>
       </div>
 
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-        {messages.length === 0 && (
-          <div className="text-center text-muted-foreground text-sm py-12">
-            <MessageCircle className="w-10 h-10 mx-auto mb-2 opacity-50" />
-            Envía un mensaje para iniciar la conversación
-          </div>
-        )}
-
-        {messages.map((msg) => (
-          <div key={msg.id} className={`flex items-end gap-2 ${msg.is_from_user ? "justify-end" : "justify-start"}`}>
-            {!msg.is_from_user && (
+        {messages.map((m, i) => (
+          <div key={i} className={`flex items-end gap-2 ${m.from === "user" ? "justify-end" : "justify-start"}`}>
+            {m.from === "bot" && (
               <img src={logo} alt="Killy" className="w-7 h-7 rounded-full object-contain bg-card border border-border shrink-0" />
             )}
-            <div className={`max-w-[75%] rounded-2xl px-4 py-2 text-sm ${
-              msg.is_from_user
-                ? "bg-gradient-gold text-white rounded-br-md"
-                : "glass-card text-foreground rounded-bl-md"
-            }`}>
-              {msg.message}
-              <p className="text-[10px] opacity-60 mt-1">
-                {new Date(msg.created_at).toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}
-              </p>
+            <div className="max-w-[80%] space-y-1.5">
+              <div className={`rounded-2xl px-4 py-2 text-sm whitespace-pre-line ${
+                m.from === "user"
+                  ? "bg-gradient-gold text-white rounded-br-md"
+                  : "glass-card text-foreground rounded-bl-md"
+              }`}>
+                {m.text}
+              </div>
+              {m.navLink && (
+                <button
+                  onClick={() => navigate(m.navLink!.path)}
+                  className="flex items-center gap-1.5 text-xs font-medium text-primary hover:underline px-1"
+                >
+                  <ArrowRight className="w-3 h-3" />
+                  {m.navLink.label}
+                </button>
+              )}
             </div>
-            {msg.is_from_user && (
+            {m.from === "user" && (
               avatar ? (
                 <div className={`w-7 h-7 rounded-full ${avatarBg} flex items-center justify-center text-sm shrink-0`}>{avatar}</div>
               ) : (
@@ -148,21 +203,41 @@ const Soporte = () => {
             )}
           </div>
         ))}
-        {typing && <TypingIndicator />}
         <div ref={bottomRef} />
       </div>
 
-      <form onSubmit={sendMessage} className="px-4 py-3 border-t border-border flex gap-2">
-        <Input
-          placeholder="Escribe tu mensaje..."
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          className="flex-1"
-        />
-        <Button type="submit" size="icon" className="bg-gradient-gold text-white" disabled={sending || !newMessage.trim()}>
-          <Send className="w-4 h-4" />
-        </Button>
-      </form>
+      {/* Options */}
+      <div className="px-4 py-3 border-t border-border space-y-1.5 max-h-56 overflow-y-auto">
+        {node?.options.map((opt, i) => (
+          <button
+            key={i}
+            onClick={() => handleOption(opt.label, opt.next)}
+            className="w-full text-left text-sm px-3 py-2.5 rounded-xl border border-border bg-card hover:bg-muted transition-colors active:scale-[0.98]"
+          >
+            {opt.label}
+          </button>
+        ))}
+
+        {currentNode === "whatsapp" && (
+          <a
+            href={WA_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 w-full text-sm px-3 py-3 rounded-xl bg-green-500 text-white font-bold hover:bg-green-600 transition-colors active:scale-[0.98]"
+          >
+            <ExternalLink className="w-4 h-4" /> Contactar por WhatsApp
+          </a>
+        )}
+
+        {currentNode !== "root" && (
+          <button
+            onClick={resetChat}
+            className="w-full text-center text-xs text-muted-foreground hover:text-primary py-1"
+          >
+            ↩ Regresar al inicio
+          </button>
+        )}
+      </div>
     </div>
   );
 };

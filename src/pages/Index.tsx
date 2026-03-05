@@ -27,22 +27,17 @@ const defaultHeroImages = [heroImage, hero1, hero2, hero3, hero4, hero5, hero6, 
 
 const quickServices = [
   { icon: <AlertTriangle className="w-5 h-5" />, title: "Asistencia Vial", desc: "Ayuda en el camino 24/7", path: "/asistencia" },
-  { icon: <Car className="w-5 h-5" />, title: "Mi Unidad", desc: "Registra tu VIN", path: "/mi-unidad" },
   { icon: <Shield className="w-5 h-5" />, title: "Garantías", desc: "Reportar falla", path: "/garantias" },
-  { icon: <Bell className="w-5 h-5" />, title: "Recordatorios", desc: "Mantenimiento programado", path: "/recordatorios" },
   { icon: <ShoppingCart className="w-5 h-5" />, title: "Refacciones", desc: "Pide partes originales", path: "/refacciones" },
   { icon: <FileText className="w-5 h-5" />, title: "Manual de Uso", desc: "Programa de mantenimiento", path: "/manual" },
   { icon: <MapPin className="w-5 h-5" />, title: "Mapa de Servicios", desc: "Puntos de venta, talleres y más", path: "/mapa" },
-  { icon: <MessageCircle className="w-5 h-5" />, title: "Soporte", desc: "Chat con nuestro equipo", path: "/soporte" },
   { icon: <Calculator className="w-5 h-5" />, title: "Simula tu Crédito", desc: "Nueva unidad King Long", path: "/credito" },
   { icon: <DollarSign className="w-5 h-5" />, title: "Precios", desc: "Catálogo de unidades", path: "/precios" },
   { icon: <Fuel className="w-5 h-5" />, title: "Calculadora Gas", desc: "Calcula tu consumo", path: "/gasolina" },
   { icon: <Lightbulb className="w-5 h-5" />, title: "Consejos", desc: "Tips para tu unidad", path: "/consejos" },
   { icon: <BookOpen className="w-5 h-5" />, title: "Historia", desc: "Conoce la marca King Long", path: "/historia" },
-  { icon: <MessageSquare className="w-5 h-5" />, title: "Sugerencias", desc: "Déjanos tu opinión", path: "/sugerencias" },
   { icon: <Gamepad2 className="w-5 h-5" />, title: "Kingo Runner", desc: "¡Juega y diviértete!", path: "/juego" },
   { icon: <Handshake className="w-5 h-5" />, title: "Sé Distribuidor", desc: "Únete a la red King Long", path: "https://kinglong.mx/distri/distribuidores.html?srsltid=AfmBOoql9BYW0GU0BXHqN8BxDJ7oI7mNs4A8fZbFbT7Nmr1330RWafTn", external: true },
-  { icon: <Settings className="w-5 h-5" />, title: "Configuración", desc: "Tema oscuro y notificaciones", path: "/configuracion" },
 ];
 
 const novedades = [
@@ -93,14 +88,8 @@ const Index = () => {
   return (
     <div className="min-h-screen pb-20 pt-safe bg-background">
       {/* Logo + Profile + Logout */}
-      <div className="flex items-center justify-between px-4 py-3 bg-background">
-        <button onClick={() => navigate("/perfil")} className="text-muted-foreground hover:text-primary">
-          {avatar ? (
-            <div className={`w-8 h-8 rounded-full ${avatarBg} flex items-center justify-center text-lg`}>{avatar}</div>
-          ) : (
-            <UserCircle className="w-6 h-6" />
-          )}
-        </button>
+      <div className="flex items-center justify-between px-4 py-3 bg-background pl-14">
+        <div />
         <img src={logo} alt="King Long División Minivan México" className="h-14 object-contain" />
         <button onClick={signOut} className="text-muted-foreground hover:text-primary">
           <LogOut className="w-5 h-5" />

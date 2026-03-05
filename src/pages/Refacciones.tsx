@@ -62,7 +62,19 @@ const Refacciones = () => {
         </div>
       )}
 
-      <div className="mt-6 p-4 rounded-xl bg-card border border-border text-center space-y-2">
+      <div className="mt-6">
+        <a
+          href="https://www.mercadolibre.com.mx"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#FFE600] text-[#333] font-bold text-base hover:bg-[#FFD700] transition-colors active:scale-[0.98]"
+        >
+          <ExternalLink className="w-5 h-5" />
+          Ver tienda completa en Mercado Libre
+        </a>
+      </div>
+
+      <div className="mt-4 p-4 rounded-xl bg-card border border-border text-center space-y-2">
         <p className="text-sm text-muted-foreground">¿No encuentras lo que buscas?</p>
         <a
           href="https://wa.me/528712200830?text=Hola, necesito información sobre refacciones King Long"

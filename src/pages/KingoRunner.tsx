@@ -1,11 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { playWoosh, playGameOver, playScore, startMusic, stopMusic, setMusicSpeed, resumeAudioContext } from "@/hooks/useGameAudio";
+import { playWoosh, playGameOver, playScore, startMusic, stopMusic, setMusicSpeed, resumeAudioContext, setMusicVolume } from "@/hooks/useGameAudio";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { Volume2, VolumeX, Settings, Pause, Play } from "lucide-react";
 
-const LANE_COUNT = 3;
-const LANE_WIDTH = 80;
-const GAME_W = LANE_COUNT * LANE_WIDTH;
 const GAME_H = 500;
 const TRUCK_SIZE = 50;
 const OBS_SIZE = 40;
@@ -15,27 +13,35 @@ const SPAWN_INTERVAL_BASE = 60;
 type ObstacleType = "cone" | "car_red" | "car_blue" | "barrel" | "lantern";
 interface Obstacle { lane: number; y: number; type: ObstacleType; scored: boolean; }
 
-const obstacleTypes: ObstacleType[] = ["cone", "car_red", "car_blue", "barrel", "lantern"];
+const allObstacleTypes: ObstacleType[] = ["cone", "car_red", "car_blue", "barrel", "lantern"];
+
+const roadThemes: Record<string, { road: string; sidewalk: string; line: string; label: string }> = {
+  city: { road: "#3a3a3a", sidewalk: "#d4c5a9", line: "#ffffff55", label: "Ciudad" },
+  highway: { road: "#2d2d2d", sidewalk: "#6b8e23", line: "#FFD70088", label: "Autopista" },
+  night: { road: "#1a1a2e", sidewalk: "#16213e", line: "#e94560aa", label: "Nocturna" },
+};
 
 const KingoRunner = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [gameState, setGameState] = useState<"idle" | "playing" | "over">("idle");
+  const [gameState, setGameState] = useState<"idle" | "playing" | "over" | "paused">("idle");
   const [score, setScore] = useState(0);
   const { user } = useAuth();
-
-  // Load high score from localStorage first, then try DB
   const [highScore, setHighScore] = useState(() => parseInt(localStorage.getItem("kingo_high") || "0"));
+  const [soundOn, setSoundOn] = useState(true);
+  const [showSettings, setShowSettings] = useState(false);
+  const [laneCount, setLaneCount] = useState(3);
+  const [roadTheme, setRoadTheme] = useState("city");
+  const [enabledObs, setEnabledObs] = useState<ObstacleType[]>([...allObstacleTypes]);
+
+  const LANE_WIDTH = 80;
+  const GAME_W = laneCount * LANE_WIDTH;
 
   useEffect(() => {
-    // Load from DB if available
     if (user) {
       supabase.from("support_messages").select("message").eq("user_id", user.id).like("message", "[KINGO_RECORD]%").order("created_at", { ascending: false }).limit(1).then(({ data }) => {
         if (data && data.length > 0) {
           const dbScore = parseInt(data[0].message.replace("[KINGO_RECORD] ", ""));
-          if (dbScore > highScore) {
-            setHighScore(dbScore);
-            localStorage.setItem("kingo_high", String(dbScore));
-          }
+          if (dbScore > highScore) { setHighScore(dbScore); localStorage.setItem("kingo_high", String(dbScore)); }
         }
       });
     }
@@ -55,9 +61,7 @@ const KingoRunner = () => {
     localStorage.setItem("kingo_high", String(newScore));
     setHighScore(newScore);
     if (user) {
-      supabase.from("support_messages").insert({
-        user_id: user.id, message: `[KINGO_RECORD] ${newScore}`, is_from_user: true,
-      }).then(() => {});
+      supabase.from("support_messages").insert({ user_id: user.id, message: `[KINGO_RECORD] ${newScore}`, is_from_user: true }).then(() => {});
     }
   }, [user]);
 
@@ -66,37 +70,54 @@ const KingoRunner = () => {
     const s = stateRef.current;
     if (s.gameState === "over") { s.gameState = "idle"; setGameState("idle"); return; }
     if (s.gameState === "idle") {
-      s.gameState = "playing"; s.lane = 1; s.targetLane = 1;
-      s.truckX = LANE_WIDTH + (LANE_WIDTH - TRUCK_SIZE) / 2;
+      const startLane = Math.floor(laneCount / 2);
+      s.gameState = "playing"; s.lane = startLane; s.targetLane = startLane;
+      s.truckX = startLane * LANE_WIDTH + (LANE_WIDTH - TRUCK_SIZE) / 2;
       s.obstacles = []; s.score = 0; s.speed = BASE_SPEED; s.frame = 0;
       setGameState("playing"); setScore(0);
-      startMusic();
+      if (soundOn) startMusic();
     }
-  }, []);
+  }, [soundOn, laneCount]);
+
+  const togglePause = useCallback(() => {
+    const s = stateRef.current;
+    if (s.gameState === "playing") {
+      s.gameState = "paused"; setGameState("paused"); stopMusic();
+    } else if (s.gameState === "paused") {
+      s.gameState = "playing"; setGameState("playing"); if (soundOn) startMusic();
+    }
+  }, [soundOn]);
 
   const moveLane = useCallback((dir: -1 | 1) => {
     const s = stateRef.current;
     if (s.gameState !== "playing") return;
     const newLane = s.targetLane + dir;
-    if (newLane >= 0 && newLane < LANE_COUNT) {
+    if (newLane >= 0 && newLane < laneCount) {
       s.targetLane = newLane;
-      playWoosh();
+      if (soundOn) playWoosh();
     }
-  }, []);
+  }, [laneCount, soundOn]);
+
+  const toggleSound = () => {
+    const next = !soundOn;
+    setSoundOn(next);
+    if (!next) { stopMusic(); setMusicVolume(0); } else { setMusicVolume(0.15); if (stateRef.current.gameState === "playing") startMusic(); }
+  };
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.code === "ArrowLeft" || e.code === "KeyA") { e.preventDefault(); moveLane(-1); }
       if (e.code === "ArrowRight" || e.code === "KeyD") { e.preventDefault(); moveLane(1); }
-      if (e.code === "Space") { e.preventDefault(); startGame(); }
+      if (e.code === "Space") { e.preventDefault(); if (gameState === "playing" || gameState === "paused") togglePause(); else startGame(); }
+      if (e.code === "KeyP") { e.preventDefault(); togglePause(); }
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [moveLane, startGame]);
+  }, [moveLane, startGame, togglePause, gameState]);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartRef.current = e.touches[0].clientX;
-    if (stateRef.current.gameState !== "playing") startGame();
+    if (stateRef.current.gameState !== "playing" && stateRef.current.gameState !== "paused") startGame();
   };
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartRef.current === null) return;
@@ -129,7 +150,7 @@ const KingoRunner = () => {
       case "cone":
         ctx.fillStyle = "#f97316";
         ctx.beginPath(); ctx.moveTo(cx, y); ctx.lineTo(x + 5, y + OBS_SIZE); ctx.lineTo(x + OBS_SIZE - 5, y + OBS_SIZE); ctx.closePath(); ctx.fill();
-        ctx.fillStyle = "#fff"; ctx.fillRect(cx - 6, y + OBS_SIZE * 0.35, 12, 4); ctx.fillRect(cx - 4, y + OBS_SIZE * 0.6, 8, 3);
+        ctx.fillStyle = "#fff"; ctx.fillRect(cx - 6, y + OBS_SIZE * 0.35, 12, 4);
         break;
       case "car_red":
         ctx.fillStyle = "#dc2626";
@@ -148,8 +169,6 @@ const KingoRunner = () => {
       case "barrel":
         ctx.fillStyle = "#78716c";
         ctx.beginPath(); ctx.arc(cx, y + OBS_SIZE / 2, OBS_SIZE / 2 - 4, 0, Math.PI * 2); ctx.fill();
-        ctx.strokeStyle = "#a8a29e"; ctx.lineWidth = 2;
-        ctx.beginPath(); ctx.arc(cx, y + OBS_SIZE / 2, OBS_SIZE / 2 - 4, 0, Math.PI * 2); ctx.stroke();
         ctx.fillStyle = "#fbbf24"; ctx.fillRect(cx - 4, y + OBS_SIZE / 2 - 6, 8, 12);
         break;
       case "lantern":
@@ -162,12 +181,6 @@ const KingoRunner = () => {
         ctx.moveTo(cx - 8, y + OBS_SIZE * 0.7); ctx.lineTo(cx + 8, y + OBS_SIZE * 0.7);
         ctx.stroke();
         ctx.fillStyle = "#fbbf24"; ctx.fillRect(cx - 3, y, 6, 6);
-        ctx.strokeStyle = "#fbbf24"; ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(cx - 2, y + OBS_SIZE - 2); ctx.lineTo(cx - 4, y + OBS_SIZE + 4);
-        ctx.moveTo(cx, y + OBS_SIZE - 2); ctx.lineTo(cx, y + OBS_SIZE + 5);
-        ctx.moveTo(cx + 2, y + OBS_SIZE - 2); ctx.lineTo(cx + 4, y + OBS_SIZE + 4);
-        ctx.stroke();
         break;
     }
   };
@@ -175,48 +188,51 @@ const KingoRunner = () => {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    canvas.width = GAME_W;
     const ctx = canvas.getContext("2d")!;
+    const theme = roadThemes[roadTheme] || roadThemes.city;
 
     const loop = () => {
       const s = stateRef.current;
       ctx.clearRect(0, 0, GAME_W, GAME_H);
 
       // Sidewalks
-      ctx.fillStyle = "#d4c5a9"; ctx.fillRect(0, 0, 15, GAME_H); ctx.fillRect(GAME_W - 15, 0, 15, GAME_H);
+      ctx.fillStyle = theme.sidewalk; ctx.fillRect(0, 0, 15, GAME_H); ctx.fillRect(GAME_W - 15, 0, 15, GAME_H);
       // Road
-      ctx.fillStyle = "#3a3a3a"; ctx.fillRect(15, 0, GAME_W - 30, GAME_H);
+      ctx.fillStyle = theme.road; ctx.fillRect(15, 0, GAME_W - 30, GAME_H);
 
-      s.roadOffset = (s.roadOffset + s.speed) % 30;
-      ctx.strokeStyle = "#ffffff55"; ctx.lineWidth = 2; ctx.setLineDash([12, 12]);
-      for (let i = 1; i < LANE_COUNT; i++) {
-        const lx = 15 + ((GAME_W - 30) / LANE_COUNT) * i;
+      s.roadOffset = (s.roadOffset + (s.gameState === "playing" ? s.speed : 0)) % 30;
+      ctx.strokeStyle = theme.line; ctx.lineWidth = 2; ctx.setLineDash([12, 12]);
+      for (let i = 1; i < laneCount; i++) {
+        const lx = 15 + ((GAME_W - 30) / laneCount) * i;
         ctx.lineDashOffset = -s.roadOffset;
         ctx.beginPath(); ctx.moveTo(lx, 0); ctx.lineTo(lx, GAME_H); ctx.stroke();
       }
       ctx.setLineDash([]);
 
       // Buildings
-      s.buildingOffset = (s.buildingOffset + s.speed * 0.5) % 120;
+      s.buildingOffset = (s.buildingOffset + (s.gameState === "playing" ? s.speed * 0.5 : 0)) % 120;
       const colors = ["#e74c3c", "#f39c12", "#e91e63", "#9b59b6", "#3498db", "#1abc9c"];
       for (let yy = -s.buildingOffset; yy < GAME_H + 120; yy += 60) {
         const ci = Math.abs(Math.floor(yy / 60)) % colors.length;
         ctx.fillStyle = colors[ci] + "88"; ctx.fillRect(1, yy, 12, 8);
         ctx.fillStyle = colors[(ci + 3) % colors.length] + "88"; ctx.fillRect(GAME_W - 13, yy + 25, 12, 8);
-        ctx.fillStyle = "#fbbf2488"; ctx.fillRect(3, yy + 15, 3, 3); ctx.fillRect(GAME_W - 8, yy + 40, 3, 3);
       }
 
       if (s.gameState === "playing") {
         s.frame++;
         s.speed = BASE_SPEED + Math.floor(s.score / 5) * 0.5;
-        setMusicSpeed(s.speed);
+        if (soundOn) setMusicSpeed(s.speed);
 
-        const targetX = 15 + ((GAME_W - 30) / LANE_COUNT) * s.targetLane + ((GAME_W - 30) / LANE_COUNT - TRUCK_SIZE) / 2;
+        const laneW = (GAME_W - 30) / laneCount;
+        const targetX = 15 + laneW * s.targetLane + (laneW - TRUCK_SIZE) / 2;
         s.truckX += (targetX - s.truckX) * 0.35;
 
         const spawnRate = Math.max(25, SPAWN_INTERVAL_BASE - s.score * 1.5);
         if (s.frame % Math.floor(spawnRate) === 0) {
-          const lane = Math.floor(Math.random() * LANE_COUNT);
-          const type = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+          const lane = Math.floor(Math.random() * laneCount);
+          const avail = enabledObs.length > 0 ? enabledObs : allObstacleTypes;
+          const type = avail[Math.floor(Math.random() * avail.length)];
           s.obstacles.push({ lane, y: -OBS_SIZE, type, scored: false });
         }
 
@@ -226,14 +242,15 @@ const KingoRunner = () => {
           if (ob.y > GAME_H + 20) { s.obstacles.splice(i, 1); continue; }
           if (!ob.scored && ob.y > GAME_H - TRUCK_SIZE) {
             ob.scored = true; s.score++; setScore(s.score);
-            playScore();
+            if (soundOn) playScore();
           }
-          const obX = 15 + ((GAME_W - 30) / LANE_COUNT) * ob.lane + ((GAME_W - 30) / LANE_COUNT - OBS_SIZE) / 2;
+          const laneW2 = (GAME_W - 30) / laneCount;
+          const obX = 15 + laneW2 * ob.lane + (laneW2 - OBS_SIZE) / 2;
           const truckTop = GAME_H - TRUCK_SIZE - 20;
           if (ob.y + OBS_SIZE > truckTop + 8 && ob.y < truckTop + TRUCK_SIZE - 8 &&
             Math.abs(obX + OBS_SIZE / 2 - (s.truckX + TRUCK_SIZE / 2)) < (TRUCK_SIZE / 2 + OBS_SIZE / 2 - 12)) {
             s.gameState = "over"; setGameState("over");
-            stopMusic(); playGameOver();
+            stopMusic(); if (soundOn) playGameOver();
             const currentHigh = parseInt(localStorage.getItem("kingo_high") || "0");
             if (s.score > currentHigh) saveHighScore(s.score);
           }
@@ -241,7 +258,8 @@ const KingoRunner = () => {
       }
 
       for (const ob of s.obstacles) {
-        const obX = 15 + ((GAME_W - 30) / LANE_COUNT) * ob.lane + ((GAME_W - 30) / LANE_COUNT - OBS_SIZE) / 2;
+        const laneW = (GAME_W - 30) / laneCount;
+        const obX = 15 + laneW * ob.lane + (laneW - OBS_SIZE) / 2;
         drawObstacle(ctx, obX, ob.y, ob.type);
       }
 
@@ -255,21 +273,88 @@ const KingoRunner = () => {
 
     rafRef.current = requestAnimationFrame(loop);
     return () => { cancelAnimationFrame(rafRef.current); stopMusic(); };
-  }, [saveHighScore]);
+  }, [saveHighScore, laneCount, roadTheme, enabledObs, soundOn]);
+
+  const toggleObs = (t: ObstacleType) => {
+    setEnabledObs((prev) => prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]);
+  };
+
+  const obsLabels: Record<ObstacleType, string> = {
+    cone: "🔶 Conos", car_red: "🚗 Auto rojo", car_blue: "🚙 Auto azul", barrel: "🛢️ Barriles", lantern: "🏮 Linternas",
+  };
 
   return (
     <div className="min-h-screen pb-24 px-4 pt-6 flex flex-col items-center">
       <h1 className="text-2xl font-bold text-gradient-gold mb-1">🚐 Kingo Runner</h1>
-      <p className="text-xs text-muted-foreground mb-3">Récord: {highScore} ⭐</p>
+      <p className="text-xs text-muted-foreground mb-2">Récord: {highScore} ⭐</p>
 
-      <div className="relative w-full max-w-[240px]" onClick={startGame} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+      {/* Controls bar */}
+      <div className="flex items-center gap-2 mb-3">
+        <button onClick={toggleSound} className="p-2 rounded-lg bg-card border border-border text-foreground">
+          {soundOn ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+        </button>
+        {(gameState === "playing" || gameState === "paused") && (
+          <button onClick={togglePause} className="p-2 rounded-lg bg-card border border-border text-foreground">
+            {gameState === "paused" ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
+          </button>
+        )}
+        <button onClick={() => setShowSettings(!showSettings)} className="p-2 rounded-lg bg-card border border-border text-foreground">
+          <Settings className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Settings panel */}
+      {showSettings && gameState !== "playing" && (
+        <div className="w-full max-w-[280px] p-3 rounded-xl bg-card border border-border mb-3 space-y-3 text-sm">
+          <div>
+            <p className="font-semibold text-foreground mb-1">Carriles</p>
+            <div className="flex gap-2">
+              {[2, 3, 4, 5].map((n) => (
+                <button key={n} onClick={() => setLaneCount(n)} className={`px-3 py-1 rounded-lg border text-xs font-medium ${laneCount === n ? "bg-primary text-primary-foreground border-primary" : "border-border text-foreground"}`}>
+                  {n}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="font-semibold text-foreground mb-1">Carretera</p>
+            <div className="flex gap-2 flex-wrap">
+              {Object.entries(roadThemes).map(([key, val]) => (
+                <button key={key} onClick={() => setRoadTheme(key)} className={`px-3 py-1 rounded-lg border text-xs font-medium ${roadTheme === key ? "bg-primary text-primary-foreground border-primary" : "border-border text-foreground"}`}>
+                  {val.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <p className="font-semibold text-foreground mb-1">Obstáculos</p>
+            <div className="flex gap-1.5 flex-wrap">
+              {allObstacleTypes.map((t) => (
+                <button key={t} onClick={() => toggleObs(t)} className={`px-2 py-1 rounded-lg border text-xs ${enabledObs.includes(t) ? "bg-primary/10 border-primary text-primary" : "border-border text-muted-foreground"}`}>
+                  {obsLabels[t]}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="relative w-full" style={{ maxWidth: `${Math.min(GAME_W, 400)}px` }} onClick={() => { if (gameState === "idle") startGame(); }} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
         <canvas ref={canvasRef} width={GAME_W} height={GAME_H} className="w-full rounded-xl border border-border bg-card touch-none" />
 
         {gameState === "idle" && (
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/70 rounded-xl gap-2">
             <p className="text-lg font-bold text-foreground animate-pulse">Toca para empezar</p>
             <p className="text-xs text-muted-foreground">Desliza ← → para esquivar</p>
-            <p className="text-[10px] text-muted-foreground">🎵 Con música y efectos de sonido</p>
+          </div>
+        )}
+
+        {gameState === "paused" && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/70 rounded-xl gap-2">
+            <p className="text-xl font-bold text-foreground">⏸ Pausa</p>
+            <button onClick={togglePause} className="mt-2 px-6 py-3 rounded-xl bg-gradient-gold text-white font-bold text-lg active:scale-95 transition-transform">
+              CONTINUAR
+            </button>
           </div>
         )}
 
@@ -285,7 +370,7 @@ const KingoRunner = () => {
         )}
       </div>
 
-      <p className="text-xs text-muted-foreground mt-3 text-center">Desliza para moverte • Esquiva conos, autos, barriles y linternas 🏮</p>
+      <p className="text-xs text-muted-foreground mt-3 text-center">Desliza para moverte • Esquiva obstáculos 🏮</p>
     </div>
   );
 };

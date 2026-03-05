@@ -1,15 +1,14 @@
 import { Building2, Globe, Award, Calendar } from "lucide-react";
 import timeline1988 from "@/assets/timeline-1988.jpg";
-import timeline1994 from "@/assets/timeline-1994.jpg";
-import timeline2000 from "@/assets/timeline-2000.jpg";
+// timeline-1994 and timeline-2000 removed per user request
 import timeline2010 from "@/assets/timeline-2010.jpg";
 import timeline2015 from "@/assets/timeline-2015.jpg";
 import timeline2024 from "@/assets/timeline-2024.jpg";
 
 const timeline = [
   { year: "1988", title: "Fundación", desc: "King Long United Automotive Industry Co., Ltd. se funda en Xiamen, provincia de Fujian, China.", img: timeline1988 },
-  { year: "1994", title: "Primer autobús", desc: "Se produce el primer autobús King Long, marcando el inicio de su camino en la industria automotriz.", img: timeline1994 },
-  { year: "2000", title: "Expansión internacional", desc: "King Long comienza a exportar sus vehículos a mercados internacionales, incluyendo el sudeste asiático y Medio Oriente.", img: timeline2000 },
+  { year: "1994", title: "Primer autobús", desc: "Se produce el primer autobús King Long, marcando el inicio de su camino en la industria automotriz.", img: null },
+  { year: "2000", title: "Expansión internacional", desc: "King Long comienza a exportar sus vehículos a mercados internacionales, incluyendo el sudeste asiático y Medio Oriente.", img: null },
   { year: "2006", title: "Reconocimiento mundial", desc: "La marca alcanza presencia en más de 100 países y regiones, consolidándose como uno de los mayores fabricantes de autobuses de China.", img: null },
   { year: "2010", title: "Innovación verde", desc: "King Long lanza su línea de autobuses y vehículos eléctricos e híbridos, apostando por la movilidad sustentable.", img: timeline2010 },
   { year: "2015", title: "Llegada a México", desc: "King Long ingresa al mercado mexicano con su línea de minivans y autobuses, estableciendo alianzas comerciales estratégicas.", img: timeline2015 },
