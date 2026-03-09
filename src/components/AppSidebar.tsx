@@ -1,17 +1,22 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Menu, X, UserCircle, Settings, MessageSquare } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Menu, X, UserCircle, Settings, MessageSquare, CreditCard } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const AppSidebar = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const avatar = user?.user_metadata?.avatar || null;
   const avatarBg = user?.user_metadata?.avatar_bg || "bg-red-100";
 
+  // Only show on home page
+  if (location.pathname !== "/") return null;
+
   const items = [
     { icon: UserCircle, label: "Mi Perfil", path: "/perfil" },
+    { icon: CreditCard, label: "Mi Cuenta", path: "/mi-cuenta" },
     { icon: Settings, label: "Configuración", path: "/configuracion" },
     { icon: MessageSquare, label: "Sugerencias", path: "/sugerencias" },
   ];
@@ -20,7 +25,6 @@ const AppSidebar = () => {
 
   return (
     <>
-      {/* Hamburger button - top left */}
       <button
         onClick={() => setOpen(true)}
         className="fixed top-3 left-3 z-[60] w-9 h-9 rounded-lg bg-card/80 backdrop-blur border border-border flex items-center justify-center text-foreground hover:text-primary transition-colors"
@@ -28,12 +32,10 @@ const AppSidebar = () => {
         <Menu className="w-5 h-5" />
       </button>
 
-      {/* Overlay */}
       {open && (
         <div className="fixed inset-0 z-[70] bg-black/40" onClick={() => setOpen(false)} />
       )}
 
-      {/* Sidebar panel */}
       <div className={`fixed top-0 left-0 h-full w-64 z-[80] bg-background border-r border-border transition-transform duration-300 ${open ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="flex items-center justify-between px-4 py-4 border-b border-border">
           <div className="flex items-center gap-2">
