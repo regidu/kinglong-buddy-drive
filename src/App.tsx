@@ -27,6 +27,8 @@ import Manual from "./pages/Manual";
 import Precios from "./pages/Precios";
 import KingoRunner from "./pages/KingoRunner";
 import Configuracion from "./pages/Configuracion";
+import MiCuenta from "./pages/MiCuenta";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import LoadingScreen from "./components/LoadingScreen";
 import AppSidebar from "./components/AppSidebar";
@@ -68,6 +70,8 @@ const AppRoutes = () => {
         <Route path="/precios" element={<ProtectedRoute><Precios /></ProtectedRoute>} />
         <Route path="/juego" element={<ProtectedRoute><KingoRunner /></ProtectedRoute>} />
         <Route path="/configuracion" element={<ProtectedRoute><Configuracion /></ProtectedRoute>} />
+        <Route path="/mi-cuenta" element={<ProtectedRoute><MiCuenta /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {user && <BottomNav />}

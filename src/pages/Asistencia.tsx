@@ -17,7 +17,7 @@ const Asistencia = () => (
       <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
         <li>Disponible únicamente para modelos <strong>2025 en adelante</strong>.</li>
         <li>Máximo <strong>2 servicios de grúa al año</strong>.</li>
-        <li>Cobertura de hasta <strong>100 km de distancia</strong>.</li>
+        <li>Cobertura de hasta <strong>100 km de distancia del punto de venta</strong>.</li>
       </ul>
     </div>
 

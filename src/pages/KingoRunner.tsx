@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { playWoosh, playGameOver, playScore, startMusic, stopMusic, setMusicSpeed, resumeAudioContext, setMusicVolume } from "@/hooks/useGameAudio";
+import { playWoosh, playGameOver, playScore, resumeAudioContext } from "@/hooks/useGameAudio";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Volume2, VolumeX, Settings, Pause, Play } from "lucide-react";
@@ -75,18 +75,14 @@ const KingoRunner = () => {
       s.truckX = startLane * LANE_WIDTH + (LANE_WIDTH - TRUCK_SIZE) / 2;
       s.obstacles = []; s.score = 0; s.speed = BASE_SPEED; s.frame = 0;
       setGameState("playing"); setScore(0);
-      if (soundOn) startMusic();
     }
-  }, [soundOn, laneCount]);
+  }, [laneCount]);
 
   const togglePause = useCallback(() => {
     const s = stateRef.current;
-    if (s.gameState === "playing") {
-      s.gameState = "paused"; setGameState("paused"); stopMusic();
-    } else if (s.gameState === "paused") {
-      s.gameState = "playing"; setGameState("playing"); if (soundOn) startMusic();
-    }
-  }, [soundOn]);
+    if (s.gameState === "playing") { s.gameState = "paused"; setGameState("paused"); }
+    else if (s.gameState === "paused") { s.gameState = "playing"; setGameState("playing"); }
+  }, []);
 
   const moveLane = useCallback((dir: -1 | 1) => {
     const s = stateRef.current;
@@ -98,11 +94,7 @@ const KingoRunner = () => {
     }
   }, [laneCount, soundOn]);
 
-  const toggleSound = () => {
-    const next = !soundOn;
-    setSoundOn(next);
-    if (!next) { stopMusic(); setMusicVolume(0); } else { setMusicVolume(0.15); if (stateRef.current.gameState === "playing") startMusic(); }
-  };
+  const toggleSound = () => setSoundOn((prev) => !prev);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -196,9 +188,7 @@ const KingoRunner = () => {
       const s = stateRef.current;
       ctx.clearRect(0, 0, GAME_W, GAME_H);
 
-      // Sidewalks
       ctx.fillStyle = theme.sidewalk; ctx.fillRect(0, 0, 15, GAME_H); ctx.fillRect(GAME_W - 15, 0, 15, GAME_H);
-      // Road
       ctx.fillStyle = theme.road; ctx.fillRect(15, 0, GAME_W - 30, GAME_H);
 
       s.roadOffset = (s.roadOffset + (s.gameState === "playing" ? s.speed : 0)) % 30;
@@ -210,7 +200,6 @@ const KingoRunner = () => {
       }
       ctx.setLineDash([]);
 
-      // Buildings
       s.buildingOffset = (s.buildingOffset + (s.gameState === "playing" ? s.speed * 0.5 : 0)) % 120;
       const colors = ["#e74c3c", "#f39c12", "#e91e63", "#9b59b6", "#3498db", "#1abc9c"];
       for (let yy = -s.buildingOffset; yy < GAME_H + 120; yy += 60) {
@@ -222,7 +211,6 @@ const KingoRunner = () => {
       if (s.gameState === "playing") {
         s.frame++;
         s.speed = BASE_SPEED + Math.floor(s.score / 5) * 0.5;
-        if (soundOn) setMusicSpeed(s.speed);
 
         const laneW = (GAME_W - 30) / laneCount;
         const targetX = 15 + laneW * s.targetLane + (laneW - TRUCK_SIZE) / 2;
@@ -250,7 +238,7 @@ const KingoRunner = () => {
           if (ob.y + OBS_SIZE > truckTop + 8 && ob.y < truckTop + TRUCK_SIZE - 8 &&
             Math.abs(obX + OBS_SIZE / 2 - (s.truckX + TRUCK_SIZE / 2)) < (TRUCK_SIZE / 2 + OBS_SIZE / 2 - 12)) {
             s.gameState = "over"; setGameState("over");
-            stopMusic(); if (soundOn) playGameOver();
+            if (soundOn) playGameOver();
             const currentHigh = parseInt(localStorage.getItem("kingo_high") || "0");
             if (s.score > currentHigh) saveHighScore(s.score);
           }
@@ -272,7 +260,7 @@ const KingoRunner = () => {
     };
 
     rafRef.current = requestAnimationFrame(loop);
-    return () => { cancelAnimationFrame(rafRef.current); stopMusic(); };
+    return () => { cancelAnimationFrame(rafRef.current); };
   }, [saveHighScore, laneCount, roadTheme, enabledObs, soundOn]);
 
   const toggleObs = (t: ObstacleType) => {
@@ -288,7 +276,6 @@ const KingoRunner = () => {
       <h1 className="text-2xl font-bold text-gradient-gold mb-1">🚐 Kingo Runner</h1>
       <p className="text-xs text-muted-foreground mb-2">Récord: {highScore} ⭐</p>
 
-      {/* Controls bar */}
       <div className="flex items-center gap-2 mb-3">
         <button onClick={toggleSound} className="p-2 rounded-lg bg-card border border-border text-foreground">
           {soundOn ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
@@ -303,7 +290,6 @@ const KingoRunner = () => {
         </button>
       </div>
 
-      {/* Settings panel */}
       {showSettings && gameState !== "playing" && (
         <div className="w-full max-w-[280px] p-3 rounded-xl bg-card border border-border mb-3 space-y-3 text-sm">
           <div>
