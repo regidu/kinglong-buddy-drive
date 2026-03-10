@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, UserCircle, Settings, MessageSquare, CircleUserRound } from "lucide-react";
+import { Menu, X, UserCircle, Settings, MessageSquare, PlusCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const AppSidebar = () => {
@@ -16,7 +16,7 @@ const AppSidebar = () => {
 
   const items = [
     { icon: UserCircle, label: "Mi Perfil", path: "/perfil" },
-    { icon: CircleUserRound, label: "Mi Cuenta", path: "/mi-cuenta" },
+    { icon: PlusCircle, label: "Mi Cuenta", path: "/mi-cuenta" },
     { icon: Settings, label: "Configuración", path: "/configuracion" },
     { icon: MessageSquare, label: "Sugerencias", path: "/sugerencias" },
   ];
