@@ -16,7 +16,7 @@ const AppSidebar = () => {
 
   const items = [
     { icon: UserCircle, label: "Mi Perfil", path: "/perfil" },
-    { icon: CircleUserRound, label: "Mi Cuenta", path: "/mi-cuenta" },
+    { icon: PlusCircle, label: "Mi Cuenta", path: "/mi-cuenta" },
     { icon: Settings, label: "Configuración", path: "/configuracion" },
     { icon: MessageSquare, label: "Sugerencias", path: "/sugerencias" },
   ];
