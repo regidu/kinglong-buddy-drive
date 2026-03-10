@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Menu, X, UserCircle, Settings, MessageSquare, CreditCard } from "lucide-react";
+import { Menu, X, UserCircle, Settings, MessageSquare, CircleUserRound } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const AppSidebar = () => {
