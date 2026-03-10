@@ -72,7 +72,7 @@ const Terminos = () => {
           <p>Hemos implementado medidas técnicas para proteger su información (incluyendo el VIN y datos patrimoniales) contra destrucción, pérdida, alteración o acceso no autorizado. Los datos del juego "Kingo Runner" (puntuaciones) se almacenan localmente en su dispositivo.</p>
 
           <h2 className="text-foreground font-semibold">6. Derechos ARCO</h2>
-          <p>Usted puede ejercer sus derechos de Acceso, Rectificación, Cancelación u Oposición enviando un correo electrónico a: <a href="mailto:contacto@kinglong.mx" className="text-primary underline">contacto@kinglong.mx</a>.</p>
+          <p>Usted puede ejercer sus derechos de Acceso, Rectificación, Cancelación u Oposición enviando un correo electrónico a: <a href="mailto:auxiliar@kinglong.mx" className="text-primary underline">auxiliar@kinglong.mx</a>.</p>
 
           <h2 className="text-foreground font-semibold">7. Consentimiento</h2>
           <p>Al registrar sus datos y utilizar las funciones de la App, usted otorga su consentimiento expreso para el tratamiento de sus datos personales conforme a este Aviso de Privacidad.</p>
