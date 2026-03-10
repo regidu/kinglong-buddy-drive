@@ -40,7 +40,7 @@ const Terminos = () => {
           <h2 className="text-foreground font-semibold">3. Privacidad</h2>
           <p>Sus datos personales serán tratados conforme a nuestra política de privacidad y la legislación mexicana aplicable. Consulte nuestro Aviso de Privacidad Integral para más detalles.</p>
           <h2 className="text-foreground font-semibold">4. Limitación de responsabilidad</h2>
-          <p>King Long México no se hace responsable por el uso indebido de la información proporcionada en esta aplicación.</p>
+          <p>King Long México no será responsable por cualquier uso indebido, incorrecto o contrario a la finalidad de la información contenida en la presente aplicación, ni por los daños o perjuicios que pudieran derivarse del uso que el usuario realice de dicha información, siendo este último el único responsable de su utilización.</p>
         </div>
       )}
 
@@ -72,7 +72,7 @@ const Terminos = () => {
           <p>Hemos implementado medidas técnicas para proteger su información (incluyendo el VIN y datos patrimoniales) contra destrucción, pérdida, alteración o acceso no autorizado. Los datos del juego "Kingo Runner" (puntuaciones) se almacenan localmente en su dispositivo.</p>
 
           <h2 className="text-foreground font-semibold">6. Derechos ARCO</h2>
-          <p>Usted puede ejercer sus derechos de Acceso, Rectificación, Cancelación u Oposición enviando un correo electrónico a: <a href="mailto:contacto@kinglong.mx" className="text-primary underline">contacto@kinglong.mx</a>.</p>
+          <p>Usted puede ejercer sus derechos de Acceso, Rectificación, Cancelación u Oposición enviando un correo electrónico a: <a href="mailto:auxiliar@kinglong.mx" className="text-primary underline">auxiliar@kinglong.mx</a>.</p>
 
           <h2 className="text-foreground font-semibold">7. Consentimiento</h2>
           <p>Al registrar sus datos y utilizar las funciones de la App, usted otorga su consentimiento expreso para el tratamiento de sus datos personales conforme a este Aviso de Privacidad.</p>

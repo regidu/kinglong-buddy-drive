@@ -157,13 +157,6 @@ const MiUnidad = () => {
               {yearOptions.map((y) => (<option key={y} value={y}>{y}</option>))}
             </select>
             <Input placeholder="Apodo (ej: Mi Reina)" value={nickname} onChange={(e) => setNickname(e.target.value)} />
-            <Input placeholder="Placas (opcional)" value={placas} onChange={(e) => setPlacas(e.target.value)} />
-            {placas && (
-              <select value={estadoPlacas} onChange={(e) => setEstadoPlacas(e.target.value)} className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm text-foreground">
-                <option value="">Estado de las placas</option>
-                {estadosMexico.map((e) => (<option key={e} value={e}>{e}</option>))}
-              </select>
-            )}
             <p className="text-xs text-muted-foreground">📷 Podrás agregar una foto después de registrar</p>
             <div className="flex gap-2">
               <Button type="submit" className="flex-1 bg-gradient-gold text-white">Registrar</Button>
