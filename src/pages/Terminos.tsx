@@ -40,7 +40,7 @@ const Terminos = () => {
           <h2 className="text-foreground font-semibold">3. Privacidad</h2>
           <p>Sus datos personales serán tratados conforme a nuestra política de privacidad y la legislación mexicana aplicable. Consulte nuestro Aviso de Privacidad Integral para más detalles.</p>
           <h2 className="text-foreground font-semibold">4. Limitación de responsabilidad</h2>
-          <p>King Long México no se hace responsable por el uso indebido de la información proporcionada en esta aplicación.</p>
+          <p>King Long México no será responsable por cualquier uso indebido, incorrecto o contrario a la finalidad de la información contenida en la presente aplicación, ni por los daños o perjuicios que pudieran derivarse del uso que el usuario realice de dicha información, siendo este último el único responsable de su utilización.</p>
         </div>
       )}
 
