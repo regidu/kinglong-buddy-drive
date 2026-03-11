@@ -1,21 +1,22 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdmin } from "@/hooks/useAdmin";
 import { useNavigate } from "react-router-dom";
-import { Shield, Users, BarChart3, MessageSquare, Activity, Edit, Trash2, Search, RefreshCw } from "lucide-react";
+import { Shield, Users, BarChart3, MessageSquare, Activity, Trash2, Search, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import LoadingScreen from "@/components/LoadingScreen";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
-const ADMIN_EMAIL = "auxiliar@kinglong.mx";
 const COLORS = ["hsl(0,73%,42%)", "hsl(36,63%,55%)", "hsl(210,60%,50%)", "hsl(150,50%,45%)", "hsl(280,50%,55%)"];
 
-type Tab = "usuarios" | "metricas" | "resenas" | "actividad" | "edicion";
+type Tab = "usuarios" | "metricas" | "resenas" | "actividad";
 
 const Admin = () => {
   const { user, loading: authLoading } = useAuth();
+  const { isAdmin, loading: adminLoading } = useAdmin();
   const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("usuarios");
   const [users, setUsers] = useState<any[]>([]);
@@ -26,14 +27,14 @@ const Admin = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    if (!authLoading && (!user || user.email !== ADMIN_EMAIL)) {
+    if (!authLoading && !adminLoading && (!user || !isAdmin)) {
       navigate("/", { replace: true });
     }
-  }, [user, authLoading, navigate]);
+  }, [user, authLoading, adminLoading, isAdmin, navigate]);
 
   useEffect(() => {
-    if (user?.email === ADMIN_EMAIL) loadData();
-  }, [user]);
+    if (isAdmin) loadData();
+  }, [isAdmin]);
 
   const loadData = async () => {
     setLoading(true);
@@ -73,8 +74,8 @@ const Admin = () => {
     toast.success("Reseña eliminada");
   };
 
-  if (authLoading || (user?.email === ADMIN_EMAIL && loading)) return <LoadingScreen />;
-  if (user?.email !== ADMIN_EMAIL) return null;
+  if (authLoading || adminLoading || (isAdmin && loading)) return <LoadingScreen />;
+  if (!isAdmin) return null;
 
   const filteredUsers = users.filter((u) =>
     (u.email || "").toLowerCase().includes(searchTerm.toLowerCase())
