@@ -33,8 +33,8 @@ const Admin = () => {
   }, [user, authLoading, adminLoading, isAdmin, navigate]);
 
   useEffect(() => {
-    if (user?.email === ADMIN_EMAIL) loadData();
-  }, [user]);
+    if (isAdmin) loadData();
+  }, [isAdmin]);
 
   const loadData = async () => {
     setLoading(true);
