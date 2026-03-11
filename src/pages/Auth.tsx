@@ -60,7 +60,7 @@ const Auth = () => {
           password,
           options: {
             data: { full_name: fullName, phone },
-            emailRedirectTo: window.location.origin,
+            emailRedirectTo: getAuthRedirectUrl("/"),
           },
         });
         if (error) throw error;
