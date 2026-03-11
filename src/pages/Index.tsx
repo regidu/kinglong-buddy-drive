@@ -181,6 +181,11 @@ const Index = () => {
         </div>
       </div>
 
+      {/* Vehicles Table */}
+      <div className="px-4 mt-6">
+        <VehiclesTable />
+      </div>
+
       {/* Terms & Privacy footer */}
       <div className="px-4 mt-8 mb-4 text-center flex justify-center gap-4">
         <Link to="/terminos" className="text-xs text-muted-foreground hover:text-primary underline">
