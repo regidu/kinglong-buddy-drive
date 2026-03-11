@@ -32,6 +32,16 @@ import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import LoadingScreen from "./components/LoadingScreen";
 import AppSidebar from "./components/AppSidebar";
+import { useAdmin } from "./hooks/useAdmin";
+
+const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading: authLoading } = useAuth();
+  const { isAdmin, loading: adminLoading } = useAdmin();
+  if (authLoading || adminLoading) return <LoadingScreen />;
+  if (!user) return <Navigate to="/auth" replace />;
+  if (!isAdmin) return <Navigate to="/" replace />;
+  return <>{children}</>;
+};
 
 const queryClient = new QueryClient();
 
