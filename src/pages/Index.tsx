@@ -21,6 +21,8 @@ import hero13 from "@/assets/hero-13.png";
 import hero14 from "@/assets/hero-14.png";
 import logo from "@/assets/logo-kinglong.png";
 import ServiceCard from "@/components/ServiceCard";
+import DashboardMetrics from "@/components/DashboardMetrics";
+import VehiclesTable from "@/components/VehiclesTable";
 import { useAuth } from "@/hooks/useAuth";
 
 const defaultHeroImages = [heroImage, hero1, hero2, hero3, hero4, hero5, hero6, hero7, hero8, hero9, hero10, hero11, hero12, hero13, hero14];
@@ -127,6 +129,10 @@ const Index = () => {
         </div>
       </div>
 
+      {/* Dashboard Metrics */}
+      <div className="px-4 mt-6">
+        <DashboardMetrics />
+      </div>
 
       {/* Emergency Button */}
       <div className="px-4 mt-2 relative z-10">
@@ -173,6 +179,11 @@ const Index = () => {
             />
           ))}
         </div>
+      </div>
+
+      {/* Vehicles Table */}
+      <div className="px-4 mt-6">
+        <VehiclesTable />
       </div>
 
       {/* Terms & Privacy footer */}
