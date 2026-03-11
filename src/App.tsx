@@ -81,7 +81,7 @@ const AppRoutes = () => {
         <Route path="/juego" element={<ProtectedRoute><KingoRunner /></ProtectedRoute>} />
         <Route path="/configuracion" element={<ProtectedRoute><Configuracion /></ProtectedRoute>} />
         <Route path="/mi-cuenta" element={<ProtectedRoute><MiCuenta /></ProtectedRoute>} />
-        <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+        <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       {user && <BottomNav />}

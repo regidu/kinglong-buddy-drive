@@ -74,8 +74,8 @@ const Admin = () => {
     toast.success("Reseña eliminada");
   };
 
-  if (authLoading || (user?.email === ADMIN_EMAIL && loading)) return <LoadingScreen />;
-  if (user?.email !== ADMIN_EMAIL) return null;
+  if (authLoading || adminLoading || (isAdmin && loading)) return <LoadingScreen />;
+  if (!isAdmin) return null;
 
   const filteredUsers = users.filter((u) =>
     (u.email || "").toLowerCase().includes(searchTerm.toLowerCase())
