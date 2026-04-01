@@ -230,7 +230,7 @@ const KingoRunner = () => {
           if (ob.y > GAME_H + 20) { s.obstacles.splice(i, 1); continue; }
           if (!ob.scored && ob.y > GAME_H - TRUCK_SIZE) {
             ob.scored = true; s.score++; setScore(s.score);
-            if (soundOn) playScore();
+            
           }
           const laneW2 = (GAME_W - 30) / laneCount;
           const obX = 15 + laneW2 * ob.lane + (laneW2 - OBS_SIZE) / 2;
