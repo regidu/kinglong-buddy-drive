@@ -242,7 +242,27 @@ const KingoRunner = () => {
             s.gameState = "over"; setGameState("over");
             if (soundOn) playGameOver();
             const currentHigh = parseInt(localStorage.getItem("kingo_high") || "0");
-            if (s.score > currentHigh) saveHighScore(s.score);
+            if (s.score > currentHigh) {
+              saveHighScore(s.score);
+              // Launch confetti
+              const particles: typeof confettiRef.current = [];
+              const colors = ["#FFD700", "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7", "#DDA0DD", "#FF4500"];
+              for (let p = 0; p < 80; p++) {
+                particles.push({
+                  x: GAME_W / 2,
+                  y: GAME_H / 2,
+                  color: colors[Math.floor(Math.random() * colors.length)],
+                  vx: (Math.random() - 0.5) * 12,
+                  vy: (Math.random() - 0.5) * 12 - 4,
+                  size: Math.random() * 6 + 3,
+                  rotation: Math.random() * 360,
+                  rv: (Math.random() - 0.5) * 15,
+                });
+              }
+              confettiRef.current = particles;
+              setShowConfetti(true);
+              setTimeout(() => { setShowConfetti(false); confettiRef.current = []; }, 3000);
+            }
           }
         }
       }
