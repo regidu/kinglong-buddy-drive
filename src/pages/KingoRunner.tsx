@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { playWoosh, playGameOver, playScore, resumeAudioContext } from "@/hooks/useGameAudio";
+import { playWoosh, playGameOver, resumeAudioContext } from "@/hooks/useGameAudio";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Volume2, VolumeX, Settings, Pause, Play } from "lucide-react";
@@ -32,6 +32,8 @@ const KingoRunner = () => {
   const [laneCount, setLaneCount] = useState(3);
   const [roadTheme, setRoadTheme] = useState("city");
   const [enabledObs, setEnabledObs] = useState<ObstacleType[]>([...allObstacleTypes]);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const confettiRef = useRef<{ x: number; y: number; color: string; vx: number; vy: number; size: number; rotation: number; rv: number }[]>([]);
 
   const LANE_WIDTH = 80;
   const GAME_W = laneCount * LANE_WIDTH;
@@ -230,7 +232,7 @@ const KingoRunner = () => {
           if (ob.y > GAME_H + 20) { s.obstacles.splice(i, 1); continue; }
           if (!ob.scored && ob.y > GAME_H - TRUCK_SIZE) {
             ob.scored = true; s.score++; setScore(s.score);
-            if (soundOn) playScore();
+            
           }
           const laneW2 = (GAME_W - 30) / laneCount;
           const obX = 15 + laneW2 * ob.lane + (laneW2 - OBS_SIZE) / 2;
@@ -240,7 +242,27 @@ const KingoRunner = () => {
             s.gameState = "over"; setGameState("over");
             if (soundOn) playGameOver();
             const currentHigh = parseInt(localStorage.getItem("kingo_high") || "0");
-            if (s.score > currentHigh) saveHighScore(s.score);
+            if (s.score > currentHigh) {
+              saveHighScore(s.score);
+              // Launch confetti
+              const particles: typeof confettiRef.current = [];
+              const colors = ["#FFD700", "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7", "#DDA0DD", "#FF4500"];
+              for (let p = 0; p < 80; p++) {
+                particles.push({
+                  x: GAME_W / 2,
+                  y: GAME_H / 2,
+                  color: colors[Math.floor(Math.random() * colors.length)],
+                  vx: (Math.random() - 0.5) * 12,
+                  vy: (Math.random() - 0.5) * 12 - 4,
+                  size: Math.random() * 6 + 3,
+                  rotation: Math.random() * 360,
+                  rv: (Math.random() - 0.5) * 15,
+                });
+              }
+              confettiRef.current = particles;
+              setShowConfetti(true);
+              setTimeout(() => { setShowConfetti(false); confettiRef.current = []; }, 3000);
+            }
           }
         }
       }
@@ -252,6 +274,23 @@ const KingoRunner = () => {
       }
 
       drawTruck(ctx, s.truckX, GAME_H - TRUCK_SIZE - 20);
+
+      // Draw confetti
+      if (confettiRef.current.length > 0) {
+        for (const p of confettiRef.current) {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.15;
+          p.vx *= 0.99;
+          p.rotation += p.rv;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+          ctx.restore();
+        }
+      }
 
       ctx.fillStyle = "#fff"; ctx.font = "bold 14px sans-serif"; ctx.textAlign = "right";
       ctx.fillText(`⭐ ${s.score}`, GAME_W - 20, 24);
