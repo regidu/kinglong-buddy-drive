@@ -32,6 +32,8 @@ const KingoRunner = () => {
   const [laneCount, setLaneCount] = useState(3);
   const [roadTheme, setRoadTheme] = useState("city");
   const [enabledObs, setEnabledObs] = useState<ObstacleType[]>([...allObstacleTypes]);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const confettiRef = useRef<{ x: number; y: number; color: string; vx: number; vy: number; size: number; rotation: number; rv: number }[]>([]);
 
   const LANE_WIDTH = 80;
   const GAME_W = laneCount * LANE_WIDTH;
