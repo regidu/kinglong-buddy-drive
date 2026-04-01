@@ -30,36 +30,42 @@ const chatTree: Record<string, ChatNode> = {
   unidades: {
     message: "Tenemos una línea completa de unidades King Long. ¿Cuál te interesa?",
     options: [
-      { label: "Panel Cerrada - $635,900", next: "unit_panel_cerrada" },
-      { label: "Panel Ventanas - $599,900", next: "unit_panel_ventanas" },
-      { label: "Panel Ventanas A/A - $624,900", next: "unit_panel_aa" },
-      { label: "16 Pasajeros - $769,900", next: "unit_16" },
+      { label: "Panel Ventanas A/A 5.5 m - $729,900", next: "unit_panel_aa_55" },
+      { label: "Panel Ventanas A/A 6 m - $789,900", next: "unit_panel_aa_6" },
+      { label: "Equipada 16 Pasajeros - $769,900", next: "unit_16" },
+      { label: "Equipada 16 Pas. 5.5 m - $829,900", next: "unit_16_55" },
+      { label: "Equipada 19 Pas. 6 m - $889,900", next: "unit_19_6" },
       { label: "Kingo EV - $1,449,000", next: "unit_ev" },
     ],
     navLink: { label: "Ver catálogo de precios", path: "/precios" },
   },
-  unit_panel_cerrada: {
-    message: "🚐 Panel Cerrada — $635,900 IVA incluido\n\n• Motor 2.4L\n• ABS + EBD\n• 5 velocidades + reversa\n• Rendimiento 9.1 Km/L\n• Área de carga 9.8m³\n• Capacidad 1,175 Kg\n\nPrecios sujetos a cambios.",
+  unit_panel_aa_55: {
+    message: "🚐 Panel Ventanas A/A 5.5 m — $729,900 IVA incluido\n\n• Motor 3TZ 2.7L — 161 hp\n• ABS + EBD\n• 5 vel. + reversa\n• Rendimiento 10 km/l combinado\n\nPrecios sujetos a cambios.",
     options: [{ label: "💰 Simular crédito", next: "credito" }, { label: "👤 Hablar con asesor", next: "whatsapp" }],
     navLink: { label: "Ir al simulador de crédito", path: "/credito" },
   },
-  unit_panel_ventanas: {
-    message: "🚐 Panel Ventanas — $599,900 IVA incluido\n\n• Motor 2.4L\n• ABS + EBD\n• 5 velocidades + reversa\n• Rendimiento 9.1 Km/L\n• Área de carga 9.8m³\n• Capacidad 1,175 Kg\n\nPrecios sujetos a cambios.",
-    options: [{ label: "💰 Simular crédito", next: "credito" }, { label: "👤 Hablar con asesor", next: "whatsapp" }],
-    navLink: { label: "Ir al simulador de crédito", path: "/credito" },
-  },
-  unit_panel_aa: {
-    message: "🚐 Panel Ventanas A/A — $624,900 IVA incluido\n\n• Motor 2.4L\n• ABS + EBD\n• A/C doble zona\n• Área de carga 9.8m³\n• Capacidad 1,175 Kg\n\nPrecios sujetos a cambios.",
+  unit_panel_aa_6: {
+    message: "🚐 Panel Ventanas A/A 6 m — $789,900 IVA incluido\n\n• Motor 3TZ 2.7L — 161 hp\n• ABS + EBD\n• 5 vel. + reversa\n• Carga: 1,615 kg\n\nPrecios sujetos a cambios.",
     options: [{ label: "💰 Simular crédito", next: "credito" }, { label: "👤 Hablar con asesor", next: "whatsapp" }],
     navLink: { label: "Ir al simulador de crédito", path: "/credito" },
   },
   unit_16: {
-    message: "🚐 16 Pasajeros — $769,900 IVA incluido\n\n• Motor 2.4L\n• ABS + EBD\n• 16 asientos\n• A/C doble zona\n\nPrecios sujetos a cambios.",
+    message: "🚐 Equipada 16 Pasajeros — $769,900 IVA incluido\n\n• Motor 2.4L — 137 hp, EURO 5\n• ABS + EBD + ESC\n• 2 airbags, TPMS, ISOFIX\n• Rendimiento 9.1 km/l\n\nPrecios sujetos a cambios.",
+    options: [{ label: "💰 Simular crédito", next: "credito" }, { label: "👤 Hablar con asesor", next: "whatsapp" }],
+    navLink: { label: "Ir al simulador de crédito", path: "/credito" },
+  },
+  unit_16_55: {
+    message: "🚐 Equipada 16 Pasajeros 5.5 m — $829,900 IVA incluido\n\n• Motor 3TZ 2.7L — 161 hp\n• ABS + EBD\n• 5 vel. + reversa\n• Rendimiento 10 km/l combinado\n\nPrecios sujetos a cambios.",
+    options: [{ label: "💰 Simular crédito", next: "credito" }, { label: "👤 Hablar con asesor", next: "whatsapp" }],
+    navLink: { label: "Ir al simulador de crédito", path: "/credito" },
+  },
+  unit_19_6: {
+    message: "🚐 Equipada 19 Pasajeros 6 m — $889,900 IVA incluido\n\n• Motor 3TZ 2.7L — 161 hp\n• ABS + EBD\n• 5 vel. + reversa\n• Carga: 1,615 kg\n\nPrecios sujetos a cambios.",
     options: [{ label: "💰 Simular crédito", next: "credito" }, { label: "👤 Hablar con asesor", next: "whatsapp" }],
     navLink: { label: "Ir al simulador de crédito", path: "/credito" },
   },
   unit_ev: {
-    message: "⚡ Kingo EV — $1,449,000 IVA incluido\n\n• Motor 258.15 HP\n• CATL 70.479 kWh\n• Carga rápida ≤2 hrs\n• 16 asientos\n• A/C doble zona\n\nPrecios sujetos a cambios.",
+    message: "⚡ Kingo EV — $1,449,000 IVA incluido\n\n• Motor síncrono 60/120 kW\n• Batería CATL 70.479 kWh\n• Autonomía ≥ 280 km\n• Carga rápida < 2 hrs\n• 16 pasajeros\n\nPrecios sujetos a cambios.",
     options: [{ label: "💰 Simular crédito", next: "credito" }, { label: "👤 Hablar con asesor", next: "whatsapp" }],
     navLink: { label: "Ir al simulador de crédito", path: "/credito" },
   },
