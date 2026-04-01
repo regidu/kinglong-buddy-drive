@@ -275,6 +275,23 @@ const KingoRunner = () => {
 
       drawTruck(ctx, s.truckX, GAME_H - TRUCK_SIZE - 20);
 
+      // Draw confetti
+      if (confettiRef.current.length > 0) {
+        for (const p of confettiRef.current) {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.15;
+          p.vx *= 0.99;
+          p.rotation += p.rv;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.rotation * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+          ctx.restore();
+        }
+      }
+
       ctx.fillStyle = "#fff"; ctx.font = "bold 14px sans-serif"; ctx.textAlign = "right";
       ctx.fillText(`⭐ ${s.score}`, GAME_W - 20, 24);
 
