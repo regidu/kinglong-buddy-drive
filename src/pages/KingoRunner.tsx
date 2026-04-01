@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { playWoosh, playGameOver, playScore, resumeAudioContext } from "@/hooks/useGameAudio";
+import { playWoosh, playGameOver, resumeAudioContext } from "@/hooks/useGameAudio";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Volume2, VolumeX, Settings, Pause, Play } from "lucide-react";
