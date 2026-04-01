@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Calculator, Check, Info, X, Phone } from "lucide-react";
-import unitPanelCerrada from "@/assets/unit-panel-cerrada.png";
 import unitPanelVentanas from "@/assets/unit-panel-ventanas.png";
 import unitPanelVentanasAA from "@/assets/unit-panel-ventanas-aa.png";
 import unit16Pasajeros from "@/assets/unit-16-pasajeros.png";
@@ -8,85 +7,40 @@ import unitKingoEV from "@/assets/unit-kingo-ev.png";
 
 const unidades = [
   {
-    nombre: "Panel Cerrada",
-    precio: 635900,
-    imagen: unitPanelCerrada,
-    specs: [
-      "Motor 2.4 L",
-      "Sistema de frenado ABS + EBD",
-      "5 velocidades + reversa",
-      "Rendimiento de 9.1 Km/L combinado",
-      "Faros de niebla de halógeno",
-      "Sensor de reversa auditivo",
-      "Luces diurnas horizontales",
-      "Área de carga de 9.8 m³",
-      "Capacidad de carga 1,175 Kg",
-    ],
-  },
-  {
-    nombre: "Panel Ventanas",
-    precio: 599900,
-    imagen: unitPanelVentanas,
-    specs: [
-      "Motor 2.4 L",
-      "Sistema de frenado ABS + EBD",
-      "5 velocidades + reversa",
-      "Rendimiento de 9.1 Km/L combinado",
-      "Faros de niebla de halógeno",
-      "Sensor de reversa auditivo",
-      "Luces diurnas horizontales",
-      "Área de carga de 9.8 m³",
-      "Capacidad de carga 1,175 Kg",
-    ],
-  },
-  {
-    nombre: "Panel Ventanas A/A",
-    precio: 624900,
+    nombre: "Panel Ventanas A/A 5.5 m",
+    precio: 729900,
     imagen: unitPanelVentanasAA,
-    specs: [
-      "Motor 2.4 L",
-      "Sistema de frenado ABS + EBD",
-      "5 velocidades + reversa",
-      "Rendimiento de 9.1 Km/L combinado",
-      "Faros de niebla de halógeno",
-      "Sensor de reversa auditivo",
-      "Luces diurnas horizontales",
-      "Área de carga de 9.8 m³",
-      "Capacidad de carga 1,175 Kg",
-      "A/C doble zona",
-    ],
+    specs: ["Motor 3TZ 2.7L — 161 hp", "ABS + EBD", "5 vel. + reversa", "Rendimiento 10 km/l combinado", "Dirección asistencia eléctrica", "5.470 × 1.885 × 2.285 m"],
   },
   {
-    nombre: "16 Pasajeros",
+    nombre: "Panel Ventanas A/A 6 m",
+    precio: 789900,
+    imagen: unitPanelVentanas,
+    specs: ["Motor 3TZ 2.7L — 161 hp", "ABS + EBD", "5 vel. + reversa", "Rendimiento 10 km/l combinado", "Carga: 1,615 kg", "5.998 × 1.885 × 2.290 m"],
+  },
+  {
+    nombre: "Equipada 16 Pasajeros",
     precio: 769900,
     imagen: unit16Pasajeros,
-    specs: [
-      "Motor 2.4 L",
-      "Sistema de frenado ABS + EBD",
-      "5 velocidades + reversa",
-      "Rendimiento de 9.1 Km/L combinado",
-      "Faros de niebla de halógeno",
-      "Sensor de reversa auditivo",
-      "Luces diurnas horizontales",
-      "16 asientos con seguridad",
-      "A/C doble zona",
-    ],
+    specs: ["Motor 2.4L — 137 hp, EURO 5", "ABS + EBD + ESC", "2 airbags, TPMS, ISOFIX", "Rendimiento 9.1 km/l combinado", "Rines de aluminio, parrilla cromada", "5.470 × 1.880 × 2.285 m"],
+  },
+  {
+    nombre: "Equipada 16 Pasajeros 5.5 m",
+    precio: 829900,
+    imagen: unit16Pasajeros,
+    specs: ["Motor 3TZ 2.7L — 161 hp", "ABS + EBD", "5 vel. + reversa", "Rendimiento 10 km/l combinado", "Dirección asistencia eléctrica", "5.470 × 1.885 × 2.285 m"],
+  },
+  {
+    nombre: "Equipada 19 Pasajeros 6 m",
+    precio: 889900,
+    imagen: unit16Pasajeros,
+    specs: ["Motor 3TZ 2.7L — 161 hp", "ABS + EBD", "5 vel. + reversa", "Rendimiento 10 km/l combinado", "Carga: 1,615 kg", "5.998 × 1.885 × 2.290 m"],
   },
   {
     nombre: "Kingo EV",
     precio: 1449000,
     imagen: unitKingoEV,
-    specs: [
-      "Motor 258.15 HP",
-      "Sistema de frenado ABS + EBD",
-      "CATL de 70.479 kWh",
-      "≤2 horas a carga rápida",
-      "Faros de niebla de halógeno",
-      "Sensor de reversa auditivo",
-      "Luces diurnas horizontales",
-      "16 asientos con seguridad",
-      "A/C doble zona",
-    ],
+    specs: ["Motor síncrono 60/120 kW", "Batería CATL 70.479 kWh", "Autonomía ≥ 280 km", "Carga rápida < 2 hrs", "16 pasajeros", "TPMS, ISOFIX, OBD, Airbags"],
   },
 ];
 
