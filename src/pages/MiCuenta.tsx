@@ -172,13 +172,13 @@ const MiCuenta = () => {
           <div className="mt-3 space-y-3">
             <div className="relative">
               <Input type={showCurrentPw ? "text" : "password"} placeholder="Contraseña actual" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="pr-10" />
-              <button type="button" onClick={() => setShowCurrentPw(!showCurrentPw)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground">
+              <button type="button" aria-label="Mostrar u ocultar contraseña" onClick={() => setShowCurrentPw(!showCurrentPw)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground">
                 {showCurrentPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
             <div className="relative">
               <Input type={showPw ? "text" : "password"} placeholder="Nueva contraseña" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="pr-10" minLength={8} />
-              <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground">
+              <button type="button" aria-label="Mostrar u ocultar contraseña" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-3 text-muted-foreground hover:text-foreground">
                 {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
