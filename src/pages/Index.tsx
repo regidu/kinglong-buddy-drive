@@ -19,7 +19,7 @@ import hero11 from "@/assets/hero-11.png";
 import hero12 from "@/assets/hero-12.png";
 import hero13 from "@/assets/hero-13.png";
 import hero14 from "@/assets/hero-14.png";
-import logo from "@/assets/logo-kinglong.png";
+import logo from "@/assets/logo-kinglong-optimized.png";
 import ServiceCard from "@/components/ServiceCard";
 import { useAuth } from "@/hooks/useAuth";
 
