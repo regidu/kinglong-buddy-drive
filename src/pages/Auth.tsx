@@ -75,7 +75,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-white">
-      <img src={logo} alt="King Long" className="h-16 mb-8" />
+      <img src={logo} alt="King Long" className="h-16 mb-8" width="234" height="128" />
 
       <div className="w-full max-w-sm rounded-2xl p-6 space-y-6 bg-card border border-border shadow-lg">
         <div className="text-center">
