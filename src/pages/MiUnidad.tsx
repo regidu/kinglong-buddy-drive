@@ -128,6 +128,8 @@ const MiUnidad = () => {
             <p className="text-xs text-muted-foreground -mt-2 ml-1">💡 El VIN se encuentra en la placa metálica del lado del copiloto (parte baja del parabrisas) o en la etiqueta de la puerta del conductor.</p>
             <select value={model} onChange={(e) => setModel(e.target.value)} className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm text-foreground">
               <option value="">Selecciona modelo</option>
+              <option value="Panel Cerrada">Panel Cerrada</option>
+              <option value="Panel Ventanas">Panel Ventanas</option>
               <option value="Panel Ventanas A/A 5.5 m">Panel Ventanas A/A 5.5 m</option>
               <option value="Panel Ventanas A/A 6 m">Panel Ventanas A/A 6 m</option>
               <option value="Equipada 16 Pasajeros">Equipada 16 Pasajeros</option>
