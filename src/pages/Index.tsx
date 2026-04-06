@@ -43,7 +43,7 @@ const quickServices = [
 const novedades = [
   { title: "Nuevo Kingo EV", desc: "Conoce la versión 100% eléctrica de King Long.", tag: "Novedad", type: "ventas" },
   { title: "Nuevo Motor 3TZ 2.7L", desc: "Mayor potencia (161 hp) y mejor rendimiento (10 km/l) para la nueva generación Kingo.", tag: "Novedad", type: "ventas" },
-  { title: "Mantenimiento Preventivo", desc: "Agenda tu servicio con costo preferencial.", tag: "Oferta", type: "mantenimiento" },
+  { title: "Ofertas Disponibles", desc: "Llámanos y conoce nuestras promociones vigentes en servicio y refacciones.", tag: "Oferta", type: "mantenimiento" },
 ];
 
 const Index = () => {
