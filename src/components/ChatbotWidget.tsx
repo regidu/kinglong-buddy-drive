@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { MessageCircle, X, RotateCcw, ExternalLink } from "lucide-react";
-import logo from "@/assets/logo-kinglong.png";
+import logo from "@/assets/logo-kinglong-optimized.png";
 
 interface ChatNode {
   message: string;

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Send, MessageCircle, RotateCcw, ExternalLink, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import logo from "@/assets/logo-kinglong.png";
+import logo from "@/assets/logo-kinglong-optimized.png";
 
 const WA_URL = "https://wa.me/528711377115?text=Hola,%20vengo%20del%20chat%20de%20la%20app%20y%20necesito%20ayuda%20personalizada.";
 

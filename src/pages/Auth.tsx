@@ -5,7 +5,7 @@ import { getAuthRedirectUrl } from "@/lib/deeplink";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Mail, Lock, User, LogIn, Eye, EyeOff, Check, X, Phone } from "lucide-react";
-import logo from "@/assets/logo-kinglong.png";
+import logo from "@/assets/logo-kinglong-optimized.png";
 import { toast } from "sonner";
 
 const passwordRules = [

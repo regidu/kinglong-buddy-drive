@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Lock, Eye, EyeOff, Check, X } from "lucide-react";
-import logo from "@/assets/logo-kinglong.png";
+import logo from "@/assets/logo-kinglong-optimized.png";
 import { toast } from "sonner";
 
 const passwordRules = [
