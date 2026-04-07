@@ -11,7 +11,7 @@ const Refacciones = () => {
       <p className="text-muted-foreground mb-6">Partes originales King Long</p>
 
       <button
-        onClick={() => openExternal("https://www.mercadolibre.com.mx/pagina/cmbmx")}
+        onClick={() => openExternal("https://listado.mercadolibre.com.mx/_CustId_1452146083?item_id=MLM2836826747&category_id=MLM456252&seller_id=1452146083&client=recoview-selleritems&recos_listing=true#origin=vip&component=sellerData&typeSeller=classic")}
         className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[#FFE600] text-[#333] font-bold text-base hover:bg-[#FFD700] transition-colors active:scale-[0.98]"
       >
         <ExternalLink className="w-5 h-5" />
